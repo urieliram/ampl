@@ -1,0 +1,27 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######  
+  #######
+##                       COMBINACION REQUERIDA
+##                       INTERIOR     EXTERIOR   DISPONIBILIDAD
+##                 MP1   3            7          20
+##                 MP2   4            1          9
+## Utilidad por tonelada 100000       300000
+
+set TIPOS:= INTERIOR EXTERIOR;
+set MATERIAL:= MP1 MP2;
+
+param utilidad:=  
+                INTERIOR 100000
+                EXTERIOR 300000;
+
+param combinacion[tr]: INTERIOR EXTERIOR:=
+			   MP1 3            7 
+			   MP2 4            1;  
+
+
+param disponibilidad := 
+					   MP1 20
+					   MP2 9;     

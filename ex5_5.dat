@@ -1,0 +1,32 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set PRODUCTOS := regular extra;
+set PETROLEOS := nacional importado;
+
+param:		maxima minima :=
+regular		100000	50000	
+extra		20000 	5000;
+
+param: 	beneficio :=
+regular	12
+extra	14;
+
+param: 	costo :=
+nacional	8
+importado	15;
+
+param: 	presion_pro octanaje_pro :=
+regular		23		88	
+extra		23		93	;
+
+param: 	presion_pet octanaje_pet :=
+nacional		25		87	
+importado		15		98	;
+
+param: inventario := 
+nacional 40000 
+importado 60000; 

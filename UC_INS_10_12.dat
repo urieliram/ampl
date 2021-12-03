@@ -1,0 +1,165 @@
+####### http://people.brunel.ac.uk/~mastjjb/jeb/orlib/unitinfo.html
+
+###########  SETS
+
+set T := 1 2 3 4 5 6 7 8 9 10  ;   ## Periods
+set J := 1 2 3 4 5 6 7 8 ;         ## Generation units
+set C := 1 ;                       ## Linear pieces in the cost function of unit j 
+
+###########  PARAMETERS
+
+param Pmax :=1	118  ## The maximum power output unit j
+			2	119
+			3	105
+			4	113
+			5	102
+			6	190
+			7	208
+			8	211	; 	   			  
+
+param Pmin := 1	32 ## The minimum power output unit j
+			2	37
+			3	48
+			4	48
+			5	47
+			6	50
+			7	62
+			8	55 ; 	   
+
+param cU :=  1	172.862432 ## The cost of starting up unit j in period t
+			2	168.685601
+			3	162.202704
+			4	160.219192
+			5	159.160047
+			6	265.61696
+			7	273.416626
+			8	306.21623 ;          
+
+param c  := 1	43.169962  ## Cost of producing power generation j
+			2	45.086696
+			3	40.460142
+			4	49.007914
+			5	45.543018
+			6	63.083598
+			7	59.217375
+			8	64.922892 ;       
+			
+## The hourly load forecast 
+param De:= 	1	653.170832
+			2	602.233658
+			3	436.221518
+			4	430.912573
+			5	443.969707
+			6	501.50719
+			7	658.479777
+			8	870.120146
+			9	1066.551107
+			10	1127.675715 ;
+
+param R :=  1	19.06341664 ## The spinning reserve requirements
+			2	18.04467316
+			3	14.72443036
+			4	14.61825146
+			5	14.87939414
+			6	16.0301438
+			7	19.16959554
+			8	23.40240292
+			9	27.33102214
+			10	28.5535143;       
+
+param alfa(tr) : 1  2  3 :=  ## Fixed coefficients of cost function of unit j 
+               1 5  15 30    ;     
+           
+param beta(tr) : 1 2 3 :=    ## Fixed coefficients of cost function of unit j 
+               1 0 0 0 ;                    
+
+param RD   :=   1	32.599073   ## Maximum ramp-down rate of unit j
+				2	36.390287
+				3	21.831385
+				4	27.091832
+				5	27.417263
+				6	61.702851
+				7	49.715649
+				8	69.178653 ;      
+
+param RU   :=   1	42.003808   ## Maximum ramp-up rate of unit j
+				2	31.325072
+				3	20.632301
+				4	27.869072
+				5	22.204262
+				6	51.694535
+				7	67.064482
+				8	64.139573 ;    
+
+param SU   :=   1	32.599073   ## Maximum startup rate of unit j  
+				2	36.390287
+				3	21.831385
+				4	27.091832
+				5	27.417263
+				6	61.702851
+				7	49.715649
+				8	69.178653 ;     
+			 
+param SD   :=   1	42.003808   ## Maximum shutdown rate of unit j
+				2	31.325072
+				3	20.632301
+				4	27.869072
+				5	22.204262
+				6	51.694535
+				7	67.064482
+				8	64.139573 ;     			
+ 
+param TU   :=   1	0      ## Number of time periods that unit j is required to be on
+				2	10
+				3	0
+				4	0
+				5	10
+				6	0
+				7	0
+				8	0 ;  
+						 ## Number of time periods that unit j is required to be off
+param TD   :=   1	0
+				2	5
+				3	0
+				4	0
+				5	5
+				6	0
+				7	0
+				8	0 ;				 
+
+param U    :=   1	0     ##  is the number of time periods that j is required to be on at the start of the planning horizon.
+				2	5
+				3	0
+				4	0
+				5	5
+				6	0
+				7	0
+				8	0 ;
+				
+param D    :=   1	0    ## is the number of time periods that j is required to be off at the start of the planning horizon.
+				2	0
+				3	0
+				4	0
+				5	0
+				6	0
+				7	0
+				8	0 ;
+
+param v0   :=   1	1	## Condiciones iniciales de estado de las unidades     
+				2	0
+				3	1
+				4	0
+				5	1
+				6	0
+				7	1
+				8	0 ;
+				
+			## Condiciones iniciales de generación de potencia
+param p0   :=   1	118    
+				2	0
+				3	105
+				4	0
+				5	102
+				6	0
+				7	200
+				8	0 ;		  

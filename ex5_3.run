@@ -1,0 +1,33 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 5.3
+## include ex5_3.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex5_3.mod;
+
+#LOAD .dat
+data ex5_3.dat;
+
+expand Z ,Rest_Balance, Rest_Normal, Rest_Extra;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+#option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, x, y, s;
+
+#SHOW RESULT
+# Limites inferior, optimo,superior y variable dual de la variable
+#display X.lb, X, X.ub, X.rc;

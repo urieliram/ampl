@@ -1,0 +1,189 @@
+## ALGORITMO DE RUTA MAS CORTA SUCESIVA
+## PARA EJECUTAR USAR EL COMANDO
+## include SSPP.run;
+
+# Mantiene una solución de flujo x[*,*] que satisface las restricciones de no negatividad
+# y capacidad u[*,*], pero viola las restricciones de balance de masa de los nodos.
+# En cada paso, el algoritmo selecciona un nodo s con exceso de oferta 
+# (es decir, la oferta aún no se ha enviado a algún nodo de demanda) y # un nodo t 
+# con demanda no satisfecha y envía flujo de s a t a lo largo de la ruta más corta 
+# en la red residual.
+# El algoritmo termina cuando la solución actual satisface todas las 
+# restricciones de balance de masa.
+model SSPP.mod;
+data  SSPP.dat;
+
+set E ordered default {};	  # set of excess node
+set D ordered default {};     # set of deficit node
+
+param  e{NODES} ;	   
+param pi{NODES} ;	   
+param k default 0 ;
+param l default 0 ;
+param temp default 0 ;
+param delta default 0 ;
+
+set P    dimen 2 default {};
+set ELIM dimen 2 default {};
+set SPP  dimen 2 default {};
+set NSP  ordered;   # Nodes on the shortest path from L to K
+
+param iter  default 0;       # contador de iteraciones
+
+############################################################
+# Declaraciones de Label Correcting
+
+set AUX dimen 2 default {};
+
+param d{NODES} default Infinity;   # distance labels
+param pred{NODES} default 0;	   # predecessor on shortest path
+
+param bandera default 0;           # criterio de paro
+param CM default 0;                # costo absoluto mas grande en la red
+let CM := max { (i,j) in ARCS } abs( c[i,j] )  ; 
+
+let d[s] := 0; 
+# Fin de declaraciones de Label Correcting
+############################################################
+
+# initialize the sets E, D & pi
+for {i in NODES} { let e[i] := b[i]; let pi[i] := 0; }  
+let E :=  { i in NODES: e[i] > 0 };
+let D :=  { i in NODES: e[i] < 0 };
+display E, D;
+
+repeat while card(E) <> 0
+{
+printf "*********** ITERATION: %d ***********\n", iter;
+# select a node k \in E and a node l \in D;
+let k := first(E);
+let l := first(D);  
+display k, l;
+
+# determine shortest path distances d[j] from node s to all 
+# other nodes in G(x) with respect to the reduced costs cpi[i,j];
+# Usaremos LABEL CORRECTING ############################################
+# include SSPP.run;
+repeat while bandera = 0
+{
+# Se eligen los arcos que todavia cumplen la condicion de no optimalidad
+let AUX :=  { (i,j) in ARCS: d[j] > d[i] + cpi[i,j] };
+  if card(AUX) <> 0 then {  
+	  for {(i,j) in AUX} 
+		{	  
+	      let d[j] := d[i] + cpi[i,j];
+	      let pred[j] := i; 	  
+		  if d[j] < -CM  then {	  
+	        printf ":-( CAUTION!!! Negative Cycle Found\n\n ";
+	        let bandera := 1 ;
+		  }	 		  
+	      break; #solo se usa el primer elemento de AUX
+		}  	  
+   }else{  
+	   let bandera := 1 ;
+	   printf ":-) LABEL CORRECTING has finished successfully \n\n ";  
+   }	   
+}; let bandera := 0;
+# Termina LABEL CORRECTING ##########################################
+
+# Se arma el conjunto de todos los arcos pertenecientes al SPP;
+let AUX := {}; let SPP := {};
+for {i in NODES:i<>1} {
+let AUX := {(pred[i],i)};
+let SPP := SPP union {AUX};
+}  
+display SPP;
+
+# Backtracking de nodo l a nodo k 
+let NSP := {l};
+repeat {
+  let NSP := NSP union {pred[last(NSP)]};
+} until k in NSP;
+display NSP;
+
+# Let P denote a shortest path from node k to node l;
+let AUX := {}; let P := {};
+for {j in 0 .. card(NSP)-2} { # Backwards through NSP to find the arcs on the shortest path from k to l
+  let AUX := { (member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP)) };
+  let P := P union {AUX};
+}
+display P;
+
+# Update pi := pi - d
+for {i in NODES} { let pi[i] := pi[i] - d[i]; }  
+display d , pi;
+
+# Computing delta = min{e[k], -e[l], min{rij : (i,j) \in P}}
+let delta := min( min(e[k],-e[l]) , min{ (i,j) in P} r[i,j] );
+display delta;
+
+
+# Update x, G(x), E, D, and the reduced costs c[i,j]
+
+	# update x	
+	for { (i,j) in P } { let x[i,j] :=  delta };
+	display x;	
+	
+	# update xacum	
+    # for { (i,j) in P } { let xacum[i,j] := xacum[i,j] + delta };
+	# display xacum;	
+		
+	# update the reduced costs c[i,j] = cpi[i,j] - pi[i] + pi[j] 
+	# update cpi[i,j]= cero arcs \in SPP
+	for { (i,j) in ARCS } {
+	      let cpi[i,j] := c[i,j] - pi[i] + pi[j];
+	      if (i,j) in SPP then{let cpi[i,j] := 0;}
+	}  	
+	
+	# update e
+	for {i in NODES} { 
+	  let e[i] := e[i] + sum{j in NODES:(j,i) in ARCS} x[j,i] - sum{j in NODES:(i,j) in ARCS} x[i,j];
+	}	
+	
+	# update E, D
+    let E :=  { i in NODES: e[i] > 0 };
+    let D :=  { i in NODES: e[i] < 0 };
+
+# Update G(x)
+# Augment delta units of flow along the path P ##################################################
+for { (i,j) in P } { 
+#display i,j;
+	       if r[i,j]=delta and (j,i) not in ARCS then{
+	         printf "1.Se modifica el valor r(%d,%d) y se crea (%d,%d) con valor de costo%d y residual%d\n",i,j,j,i,-cpi[i,j],delta;	        
+      	     let r[i,j] := 0;
+      	     let ARCS := ARCS union {(j,i)};
+      	     let r[j,i] := delta; let cpi[j,i]:=-cpi[i,j];  let u[j,i] := u[i,j]; let c[j,i]:=-cpi[i,j];      	     
+      	     let ELIM := ELIM union {(i,j)};
+      	     
+	       }else if r[i,j]=delta and (j,i) in ARCS then{	       
+	          printf "2.Se modifica el valor r(%d,%d) y se modifica (%d,%d) con valor de costo%d y residual%d\n",i,j,j,i,-cpi[i,j],delta;	        
+      	      let r[i,j] := 0;
+      	      let r[j,i] := delta; let cpi[j,i]:=-cpi[i,j]; let c[j,i]:=-c[i,j];     	     
+      	     let ELIM := ELIM union {(i,j)};
+      	      
+	       }else if r[i,j]>delta and (j,i) not in ARCS then{	       
+	          printf "3.Se modifica r(%d,%d)=%d y se crea (%d,%d) con residual=%d y c=%d \n",i,j,r[i,j]-delta,j,i,delta,-cpi[i,j] ;	            
+      	      let r[i,j] := r[i,j]-delta;
+      	      let ARCS := ARCS union {(j,i)};
+      	      let r[j,i] := delta; let cpi[j,i]:=-cpi[i,j];  let u[j,i] := u[i,j]; 
+      	         	      
+	       }else if r[i,j]>delta and (j,i) in ARCS then{	       
+	          printf "4.Se modifica r(%d,%d)=%d y modifica r(%d,%d)=%d y cpi=%d \n",i,j,r[i,j]-delta,j,i,delta+r[j,i],-cpi[i,j] ;	            
+      	      let r[i,j] := r[i,j]-delta;
+      	      let r[j,i] := r[j,i]+delta;
+	       }     
+	}  	     	     
+let ARCS := ARCS diff {ELIM};
+# Finish Augment delta ###############################################################################################
+	 	 
+## include SSPP.run;	 	 
+
+
+  display ARCS,c,cpi,r,u,x,e,E,D;
+    
+  let AUX:= {}; let P:= {}; let SPP:= {};let NSP:= {};let ELIM:= {};
+  let iter := iter + 1;
+}
+
+#printf "\n*********** Resultado SUCESIVE SHORTEST PATH PROBLEM *********** \n"; 
+#display x , bal;

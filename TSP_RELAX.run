@@ -1,0 +1,48 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include TSP_RELAX.run;
+
+# RESET THE AMPL ENVIROMENT
+reset;
+
+# LOAD THE MODEL
+model TSP.mod; 
+
+# LOAD .dat
+data TSP3.dat;
+
+# CHANGE THE SOLVER
+option solver cplexamp;
+# option cplex_options 'sensitivity';
+
+option solver cplexamp; 
+
+param GAP default Infinity;
+param iter default 0;
+param nCICLO >= 0 integer; 
+param k >= 0 integer; # numero de ciclos en el conjunto T
+let GAP := 0;
+
+#let T := { SUB16 ,SUB24 ,SUB35 ,SUB163 ,SUB245} ; 	
+let nCICLO := 2 ;
+repeat { 
+
+	printf "\nITERATION %d\n", iter;
+    let iter := iter + 1;       
+    display z, x, GAP;
+        
+   
+    # Se define el problema
+    problem TSP: x, z, leaves, arrives, subtour;
+    
+    # Se resuelve el problema
+	solve TSP;
+    printf "\n";    
+    
+    if GAP <= abs(.0001) then {
+   	break;
+    }
+         
+};
+
+#SHOW MODEL
+#expand  z, salida, llegada;

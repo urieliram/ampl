@@ -1,0 +1,44 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 5
+## include sugerido.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model sugerido.mod;
+
+#LOAD .dat
+data sugerido.dat;
+
+#Se muestra el modelo en forma extendida
+#expand Z, limite_min0,limite_max0, limite_min,limite_max,balance_1,balance_i,pipas_turno;
+
+option cplex_options (
+'presolve 0  ' &
+'timing 1  ' &
+'mipemphasis 0 ' & #  optimality vs feasibility
+'mipdisplay 5  ' &
+'mipinterval 1 ' &
+'presolve 0  ' &
+'mipcuts -1  ' &
+'cutpass -1 ' &
+'heurfreq -1 ' &
+'nodeselect 2 ' &
+'backtrack 0 ' &
+'MipGap 0.000000001 ' &   #Relative mipgap tolerance
+'FracCuts  -1 ' );  #Gomory cuts
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, x, y, u, total;

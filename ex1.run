@@ -1,0 +1,31 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 1
+##  include ex1.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex1.mod;
+
+#LOAD .dat
+data ex1.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+#option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Beneficios, X;
+
+#SHOW RESULT
+# Limites inferior, optimo,superior y variable dual de la variable
+#display X.lb, X, X.ub, X.rc;

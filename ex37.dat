@@ -1,0 +1,72 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+## Ejercicio 37
+##                                                         Precio de venta
+## 1000 barriles  500 barriles de combustible de avión  60 u.m./1000 barriles
+## de petróleo    500 barriles de aceite                40 u.m./l000 barriles
+## 
+## Tiempo de procesamiento de 1000           1 hora     130 u.m./1000 barriles
+## barriles de combustible de avión                               
+## 
+## Tiempo de procesamiento de 1000         3/4 hora     90 u.m./1000 barriles
+## barriles de aceite 
+## 
+## Se puede comprar diariamente 20,000 barriles de petróleo
+## Costo de 1000 barriles de petróleo = 40 u.m.
+## Se dispone de ocho horas de proceso en el fraccionador catalítico.
+
+#Considerar 1000 barriles como la unidad o lote mínimo del producto
+
+set PRODUCTO1 	:=  COMB     ACEITE; 
+set PRODUCTO2 	:=  COMBREF  ACEITEREF ; 
+
+set RECURSOS1	:=  BARRILES ;
+set RECURSOS2	:=  HORAS;
+
+param c         :=    40;          # costo del barril de petroleo crudo;
+param barriles  :=    20;          # Limite de barriles de petroleo crudo diario;
+
+ param b1:=       COMB       60
+                  ACEITE     40;      # Beneficio por producto No refinado. 
+ 
+ param b2:=       COMBREF   130
+                  ACEITEREF  90;      # Beneficio por producto No refinado.
+               
+ param a1:        BARRILES := 
+          COMB    0.50  
+          ACEITE  0.50;           # Cantidad de recurso necesario por producto No refinado.
+ 
+ param a2:          HORAS  :=      # Cantidad de recurso necesario por producto Refinado.
+          COMBREF   0.75    
+          ACEITEREF 1.00 ;                           
+ 
+param B1 :=                        # Cantidad de recursos disponible por producto No refinado.
+	  BARRILES 20;                 # Miles de barriles diarios.
+	  
+param B2 :=                        # Cantidad de recursos disponible por producto Refinado.
+	  HORAS	   8;  
+	  
+	  
+## maximize Z:
+## 60*x['COMB'] + 40*x['ACEITE'] + 130*y['COMBREF'] + 90*y['ACEITEREF'] - 
+## 40*XT;
+## subject to Limite_crudo_diario:
+## 	x['COMB'] + x['ACEITE'] + y['COMBREF'] + y['ACEITEREF'] <= 20;
+## subject to Limite_recursos_Norefinados['BARRILES']:
+## 	-0.5*x['COMB'] + 0.5*x['ACEITE'] = 0;
+## subject to Limite_recursos_Refinados['HORAS']:
+## 	0.75*y['COMBREF'] + y['ACEITEREF'] <= 8;
+## CPLEX 12.9.0.0: optimal integer solution; objective 1000
+## 0 MIP simplex iterations
+## 0 branch-and-bound nodes
+## :           x   y     :=
+## ACEITE      5    .
+## ACEITEREF   .    0
+## COMB        5    .
+## COMBREF     .   10
+## ;
+## Z = 1000
+## XT = 20

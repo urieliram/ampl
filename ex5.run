@@ -1,0 +1,34 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 5
+## include ex5.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex5.mod;
+
+#LOAD .dat
+data ex5.dat;
+
+#Se muestra el modelo en forma extendida
+expand Z, tipos_carbon ;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, X;
+
+#SHOW RESULT
+# Limites inferior, optimo,superior y variable dual de la variable
+display X.lb, X, X.ub, X.rc;

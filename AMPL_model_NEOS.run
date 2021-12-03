@@ -1,0 +1,7 @@
+
+options baron_options " maxiter=-1";
+solve;
+
+display   p , pb , v , y , z ;
+  
+quit;

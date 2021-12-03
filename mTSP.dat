@@ -1,0 +1,27 @@
+#######  Datos del problema.
+set N := 1 2 3 4 5 6 7 8 9;         # {i}   ciudades
+
+param m := 2;   # agentes  
+param p  := 8;    #  p denotes the maximum number of nodes that can be visited by any salesman
+param T  := 63;               # T = n/m max {cij} 
+  
+param c :    	1		2		3      4    	5      6		7		8		9	   :=
+               1  		0 		2	 	3	    4	   	1	  	11	7		6		10	
+               2   	9		0 		7		6		0		5		2		4		9
+               3   	8		2		0 		4		9		8		3		6		12
+               4   	2		1		3		0 		4		6		7		8		9
+               5   	1		6		2		9		0 		3		3		8		9
+               6   	7		4		6		12	7		0 		4		11	12
+               7		5		2		1		11	4		5   	0 		5		13
+               8		4		4		7		8		1		12	8		0 		14
+               9		9		9		9		8		8		10	4		6		0	
+                ;
+                
+
+                
+
+      
+      
+
+
+      

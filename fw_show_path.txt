@@ -1,0 +1,46 @@
+# https://s2.smu.edu/~olinick/emis8374/handouts/amplcode.html
+# Post processing for the AMPL implementation of the Floyd-Warshall algorithm.
+# This program uses the output of fw_solve.txt to show the shortest path
+# between a given source s and sink t.
+
+
+model mcnfp_model.txt;
+data  fw1_data.txt;
+
+param d {NODES,NODES} default Infinity;      # The distance matrix d
+param pred {NODES,NODES} default 0;	     # The predecessor indices	
+data  fw.out;			             # Load the optimal d and pred
+                                             # matrices
+
+set NODES_IN_PATH ordered default {};	     # Nodes in the path from s to t
+param s default 1;			     # source node;
+param t default card(NODES);		     # sink node;
+
+param i;	# Current node in the shortest path from s to t
+param j;	# Next node in the shortest path from s to t
+
+let s := 1;
+let t := 2;
+
+if d[s,t] == Infinity then 
+  printf "There is no path from %s to %s.\n",s,t;
+else { 
+  # Follow the predecessors back to the source node.
+  let j := t;
+  repeat {
+    let NODES_IN_PATH := NODES_IN_PATH union {j};
+    let j := pred[s,j];
+  } until j == s;
+  let NODES_IN_PATH := NODES_IN_PATH union {s};
+}
+
+display NODES_IN_PATH;
+
+
+printf "d[%d,%d] = %d.\n",s,t,d[s,t];
+repeat {
+  let i := last(NODES_IN_PATH);
+  let NODES_IN_PATH := NODES_IN_PATH diff {last(NODES_IN_PATH)};
+  let j := last(NODES_IN_PATH);
+  printf "From %d to %d: cost = %d\n",i,j,c[i,j];
+} while (card(NODES_IN_PATH) > 1);

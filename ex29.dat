@@ -1,0 +1,27 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+##       Rotulador      Costo
+#           A            200
+##   		B            150
+## Diariamente el número de B no supera en 1000 unidades a los de A
+## Entre las dos clases no superan 3000 unidades
+## Los de clase B no bajan de 1000 unidades por día
+
+set ROTULADOR := A  B;           # {i} Tipos de rotulador
+set RECURSOS  := a b c;          # {j} Criterios de unidades a cumplir
+
+param A:   a     b   c  :=  # Criterios de unidades a cumplir por rotulador
+      A    1    1    0 
+      B   -1    1   -1; 
+
+param B := a 1000     #criterios de unidades
+           b 3000
+           c -1000;
+
+param C :=     #costos de los rotuladores
+      A 200 
+      B 150; 

@@ -1,0 +1,74 @@
+## PARA EJECUTAR UTILIZE EL COMANDO
+## include FLOYDWARSHALL.run;
+
+# An AMPL implementation of the Floyd-Warshall algorithm as described
+# in "Network Flows: Theory, Algorithms, and Applications" by
+# Ahuja, Magnanti, and Orlin.
+
+model FLOYDWARSHALL.mod;
+#data  fw1_data.dat;
+data FLOYDWARSHALL.dat;
+
+
+param d {NODES,NODES} default Infinity;      # The distance matrix d
+param pred {NODES,NODES} default 0;	     # The predecessor indices	
+param neg_cycle_found default 0;	     # True if a negative-cost
+                                             # cycle is found
+param n1;   # The predecessor node in a negative cycle
+param n2;   # The current node in a negative cycle
+
+# Initialization
+for {i in NODES}
+  let d[i,i] := 0;
+
+for {(i,j) in ARCS} {
+  let d[i,j] := c[i,j];
+  let pred[i,j] := i;
+}
+
+
+for {k in 1 .. card(NODES)} {
+  for {i in NODES, j in NODES} {
+    printf "Comparamos d(%d,%d) > d(%d,%d) y d(%d,%d)\n ",i,j, i,k, k,j; #imprime calculos
+    if d[i,j] > d[i,k] + d[k,j] then {    
+ printf "*Comparamos d(%d,%d) > d(%d,%d) y d(%d,%d)\n ",i,j, i,k, k,j; #imprime calculos
+
+      let d[i,j] := d[i,k] + d[k,j];
+      let pred[i,j] := pred[k,j];
+  printf "Comparamos d(%d,%d) > d(%d,%d) y d(%d,%d) con suma de distancia %d\n y %d\n",i,j, i,k, k,j, d[i,j], d[i,k]+d[k,j]; #imprime calculos
+    
+    printf "*Arco (%d,%d) con distancia %d\n y predecesor %d\n",i,j,d[i,j],pred[i,j]; #imprime calculos
+    
+      # Test for negative-cost cycles
+      if (i == j) and (d[i,j] < 0) then {
+        let neg_cycle_found := 1;
+        printf "Negative-Cost Cycle Found:\n";
+        let n1 := pred[i,i];
+        let n2 := i;
+        repeat {
+          printf "Arc (%d,%d) has cost %d\n",n1,n2,c[n1,n2];
+          let n2 := n1;
+          let n1 := pred[i,n1];
+        } until n1 == i;
+        printf "Arc (%d,%d) has cost %d\n",n1,n2,c[n1,n2];
+     }
+
+    } # if d[i,j] > d[i,k] + d[k,j]
+  } # for {i in NODES, j in NODES}
+  if neg_cycle_found then break;
+} # {k in 1 .. card(NODES)} 
+
+if neg_cycle_found == 0 then  {
+  # Output the d and Pred matricies to standard output
+  printf "\nShortest Path Distances:\n";
+  printf "From\tTo\tdist\tpred\n";
+  for {i in  NODES, j in NODES} {
+    printf "%d\t%d\t%s\t%d\n",i,j,d[i,j],pred[i,j];
+  }
+
+  # Save the d and Pred matrices to the filew fw.out
+  printf "param: " > fw.out;
+  display d > fw.out;
+  printf "param:  " > fw.out;
+  display pred > fw.out;
+}

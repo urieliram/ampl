@@ -1,0 +1,35 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+##  RESET THE AMPL ENVIROMENT
+##  include ex14.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex14.mod;
+
+#LOAD .dat
+data ex14.dat;
+
+#Imprime modelo completo
+expand Z, balances;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, X;
+
+#SHOW RESULT
+# Limites inferior, optimo,superior y variable dual de la variable
+display X.lb, X, X.ub, X.rc;
+
+display balances.lb, balances.body, balances.ub;

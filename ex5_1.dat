@@ -1,0 +1,52 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## INFORMACION
+# Una dieta diaria satisfactoria debe contener al menos 2000 [kCal], 55 [g] de proteínas
+# y 800 [mg] de Calcio.
+##					           	Tabla de informacion
+#Alimento   Porcion      Energia[kCal]  Proteinas[g]  Calcio[mg]  Precio $/u  Limite u/dia
+#Avena        28     		110 			 4 			 2 			 3 				4
+#Pollo       100 			205 			32 			12 			24 				3
+#Huevos        2 			160 			13 			54 			13 				2
+#Leche       237 			160 			 8 		   285 		     9 				8
+#Pastel      170 			420 			 4 			22 			20 				2
+#Cerdo       260 			260 			14			80 			29 				2
+
+
+set ALIMENTOS := XA XP XH XL XPA XC;           # {i} Tipos de alimento
+set REQUERIMIENTO := Energia Proteina Calcio;  # {j} Requerimientos que debe contener la dieta
+
+param A:  Energia  Proteina  Calcio :=      # Aporte x und de alimento
+      XA    110 	   4 	   2
+      XP	205 	  32 	  12
+      XH	160 	  13 	  54
+      XL	160 	   8 	 285
+      XPA	420 	   4 	  22
+      XC 	260 	  14	  80;
+
+param C :=                                    # Precio del alimento
+	  XA     3
+      XP	24
+      XH	13
+      XL	 9
+      XPA	20
+      XC 	29;   
+      
+param L :=                                    # Limite de und alimento por dia
+	  XA    4
+      XP	3
+      XH	2
+      XL	8
+      XPA	2
+      XC 	2;    
+
+param B :=                                    # Limite de und alimento por dia
+	  Energia   2000
+	  Proteina    55
+	  Calcio     800;                                 
+                             
+

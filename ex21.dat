@@ -1,0 +1,34 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+# Ejercicio numero 21
+
+#######  CONJUNTOS
+set PRODUCTO 	:= I M S;
+set RECURSOS	:= a b e;
+set RECURSOS1	:= c d;
+
+#######  PARAMETROS
+param B := 
+	  I	8000 
+	  M	10000 
+	  S	12000;  
+ 
+param  U:  a	b	 e	:=  
+       I   1    1	 0			
+       M   1	0	 1      
+	   S   1	0    1;
+	   
+param  U1:  c	d		:=  
+	   I    1	1
+       M    -3	0
+	   S    0	-2.5;
+	   
+param T := 
+      a	100			
+      b	40      
+	  c	0
+	  d	0
+	  e	60;	      

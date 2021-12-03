@@ -1,0 +1,39 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 4
+
+#######  CONJUNTOS
+
+set F := naranjas platanos manzanas; #FRUTAS
+set P := a b; #PROVEEDORES
+
+#######  PARAMETROS
+
+#param c {P, F}; #
+param c: a b := 
+	naranjas 8 2
+	platanos 1 1
+	manzanas 2 7;
+
+#param d {F}; #FRUTAS
+param d:= 
+	naranjas 16 
+	platanos 5
+	manzanas 20; 
+
+#param A {PRODUCTOS, RECURSOS}; #recursos necesarios para el producto
+#param A:	p	h	m :=
+#sillas	1	2	400
+#mesas	1	3	200;
+
+#param e {P}; #PROVEEEDORES
+#param e {P};
+param e:= 
+	a 4 
+	b 10;
+	
+#param C:= sillas 2000 mesas 3000; #beneficio por producto

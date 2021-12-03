@@ -1,0 +1,20 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set PRODUCTOS := XA XB ;  
+set RECURSOS := p h m; 
+ 
+param A:         p   h   m:=  
+      XA   2   3   1
+      XB  3   2   1; 
+
+param B := p 1500 
+           h 1500
+           m 600; 
+
+param C := 
+      XA  10000 
+      XB 12000; 

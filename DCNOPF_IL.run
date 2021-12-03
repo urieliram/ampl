@@ -1,0 +1,42 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include DCNOPF_IL.run;
+
+model DCNOPF_IL.mod;
+data DCNOPF_IL.dat;
+
+option display_eps .0001;
+
+#Se define el problema de DCNOPF sin perdidas
+problem OPF: f, p, Total_Cost, BalanceNode,CapacityMax,CapacityMin,PowerMax,PowerMin,Ciclo;
+option solver cplexamp; #cplexamp KNITRO LOQO BARON LOQO MINOS
+	
+   
+param GAP default Infinity;
+param iter default 0;
+param sumlosses default 0;
+param aux default 0;
+
+repeat { 
+
+	printf "\nITERATION %d\n", iter;
+
+    #Se resuelve el problema de DCNOPF con perdidas
+	solve OPF;
+    printf "\n";
+
+    let iter:=iter+1;
+   
+    #Se calculan las nuevas perdidas del problema
+    let {k in BUS} loss[k] := ((1/2) * (sum{ m in BUS:(k,m) in BRANCH } f[k,m] * f[k,m] * r[k,m] +
+                                        sum{ i in BUS:(i,k) in BRANCH } f[i,k] * f[i,k] * r[i,k])) * (0.01);
+    
+    let  aux:= sum{ k in BUS } loss[k];     
+    let GAP := aux-sumlosses;
+    let sumlosses := aux;
+    display Total_Cost,f,p,loss,sumlosses,GAP;
+    
+    if GAP <= abs(.0001) then {
+   	break;
+    }
+         
+};

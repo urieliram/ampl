@@ -1,0 +1,27 @@
+## TO EXECUTE USE THE COMMAND
+## include TSP.run;
+
+# RESET THE AMPL ENVIROMENT
+reset;
+
+# LOAD THE MODEL
+model TSP.mod; 
+
+# LOAD .dat
+data TSP4.dat; #TSP3.dat
+
+# CHANGE THE SOLVER
+option solver cplexamp;
+
+# DEFINE PROBLEM
+problem TSP: x, z, leaves, arrives; #MAS LAS DE ROMPIMIENTO DE SUBTOURS
+option solver cplexamp; 
+
+# SOLVE PROBLEM
+solve TSP; 
+
+# OUTPUT PRINT
+display x;
+
+# SHOW MODEL
+expand  z, leaves, arrives;

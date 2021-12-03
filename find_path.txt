@@ -1,0 +1,22 @@
+#https://s2.smu.edu/~olinick/emis8374/handouts/find_path.txt
+# This routine uses the pred vector from dijkstra.txt to print out the
+# arcs on the shortest path from s to a user-specified node i
+
+# Note: this is a post-processing routine for dijkstra.txt. It assumes
+# the d and pred vectors already exist.
+
+set NSP ordered;   # Nodes on the shortest path from s to i
+let NSP := {i};
+
+repeat {
+  let NSP := NSP union {pred[last(NSP)]};
+} until s in NSP;
+
+display NSP;
+
+printf "The shortest path from %d to %d has cost %d:\n",s,i,d[i];
+# Go backwards through NSP to find the arcs on the shortest path from s to i
+for {j in 0 .. card(NSP)-2} {
+  printf "From %d to %d:\t",member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP);
+  printf "Cost = %d\n",c[member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP)];
+  }

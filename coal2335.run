@@ -1,0 +1,31 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include coal2335.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model coal2335.mod;
+
+#LOAD .dat
+data coal2335.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+#option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display   y , y0 , xM , xS , za , zs;
+
+display Balance_Mina , Almacenamiento_Mina, Balance_Silo ,Almacenamiento_Silo ,Desalojo0_Silo , 
+Satisfacer_Demanda , Nivel_Ceniza, Nivel_Ceniza_alto , Nivel_Ceniza_bajo ,Nivel_sulfuro ,
+Nivel_sulfuro_alto , Nivel_sulfuro_bajo ;
+
+
+#expand Costo_Total,
+#Balance_Nodo , Almacenamiento_Nodo,Balance_Silo ,Almacenamiento_Silo ,Desalojo0_Silo , 
+#Satisfacer_Demanda , Nivel_Ceniza, Nivel_Ceniza_alto , Nivel_Ceniza_bajo ,Nivel_sulfuro ,
+#Nivel_sulfuro_alto , Nivel_sulfuro_bajo ;

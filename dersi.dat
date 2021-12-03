@@ -1,0 +1,50 @@
+ 
+ ##### Archivo de datos usados en el DERS-I.
+ ##### 
+ 
+ 
+ ##### CONJUNTOS DEL DERS-I
+
+set SegOferta;     # Segmentos de Ofertas/Requerimiento.
+set RamasElect;    # Grupos de ramas eléctricas.
+set CentHidro;     # Centrales Hidroeléctricas.
+set PronDemanda;   # Pronostico de demandas.
+set ModoOperacionRD # Modos de operacion de unidades con rango discontinuo.
+set NodosElec;      # Nodos electricos del sistema. 
+set UnidadesDersiRC;  # Unidades que participan en el DERS-I Rango Continuo.
+set UnidadesDersiRD;  # Unidades que participan en el DERS-I Rango Discontinuo.
+set UnidadesDersiH;  # Unidades que participan en el DERS-I Hidroelectricas.
+set UnidadesDersiRE;  # Unidades que participan en el DERS-I Renovables.
+set UnidadesDersiNPR;  # Unidades que participan en el DERS-I No Programables.
+#set UnidadesDersi := UnidadesDersiRC union UnidadesDersiRD union UnidadesDersiH union UnidadesDersiRE union UnidadesDersiNPR;
+
+ ##### CONSTANTES DEL DERS-I
+
+param CD;              # Costo de la energía no suministrada; en $/MWh.
+param CS;              # Penalizacion por exedente de generacion; en $/MWh.
+param ContFluMax; 	   # Limite maximo para el contraflujo en la rama electrica, en MW.
+param FluMax;          # Limite maximo para el flujo en la rama electrica, en MW.
+param potenciaMinRD; 	# Potencia mnima operativa en Rango Discontinuo; en MW. 
+param potenciaMaxRD;   # Potencia maxima operativa en Rango Discontinuo; en MW.
+param potenciaMin;      # Potencia minima operativa; en MW.
+param potenciaMax;      # Potencia maxima operativa; en MW.
+param GB;              # Potencia de venta de energia; en MW.
+param GBRD; 
+param intercambioPot;              # {IN}Intercambio de potencia activa, en MW.
+param penVioFlujo;     # Penalizacion por violacion en el flujo de los grupos de ramas electricas; en $/MW.
+param costoOportH;      # Costo de oportunidad para unidades hidroeléctricas basado en el calor del agua a corto plazo, en $/MWh.
+param precioVentaEn;    # Precio de oferta de venta de energía; en $/MWh.
+param pronDemanda;      # Pronóstico de demanda; en MW.
+param resistenciaElec;  # Resistencia electrica de la rama electrica.
+param rampaBajada;      # Rampa de bajada para operación; en MW/h.
+param capGenRRegS;		# Capacidad de generacion asignada para reserva de regulacion secundaria; en MW.
+param capGenRRegSRD;
+param capGenRRod10;     # Capacidad de generacion asignada para reserva rodante de dies minutos, en MW.
+param capGenRRod10RD;
+param capGenRRodS;      # Capacidad de generacion asignada para reserva rodante suplementaria; en MW.
+param capGenRRodSRD; 
+param rampaRegSec;		# Rampa para regulación secundaria en x minutos; en MW
+param rampaSubida;      # Rampa de subida para operacion; en MW/h
+param sensFlujo;        # Sensibilidad de flujo en la rama eléctrica con respecto a los cambios en las inyecciones de neta potencia en los nodos; adimensional.
+param sensPerdida;      # Sensibilidad de perdidas en el nodo con respecto a los cambios en las inyecciones netas de potencia en el nodo; adimensional.
+

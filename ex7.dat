@@ -1,0 +1,37 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Producto     Requiere sustancia
+##     A           B
+## Cantidad de A <= 2B utilizada
+## B - A <= 2 g
+## A + B <= 2
+## La cantidad de B utilizada ha de ser por lo menos de 1 g
+## Se requiere 1 g de A
+## Precio de venta de A 5 millones de um / g
+## Precio de venta de B 4 millones de um / g
+
+set PRODUCTO  := A;             # {i} Producto A
+set SUSTANCIA := B;             # {j} Sustancia B
+set RECURSOS  := a, b, c, d;    # {k} Recursos disponibles
+
+
+param P :=                      # Ganancia del producto A
+         A 5000000;
+
+param C :=                      # Costo de la sustancia B
+		B 4000000;
+		
+param A: a  b  c  d   :=            # Uso de A en el recurso 
+      A  1 -1  1  0;
+
+param A2: a  b  c  d   :=            # Uso de A en el recurso 
+      B  -2  1  1  -1;
+
+param B := a  0           # Recursos diponibles 
+           b  2
+           c  5
+           d -1

@@ -1,0 +1,44 @@
+
+options baron_options " maxiter=-1";
+
+repeat while tolerance > 1e-7 {
+   solve;
+   if solve_result = "infeasible" then {
+      display {i in 1.._ncons: _con[i].slack < -1e-6} (_conname[i], _con[i].slack);
+      display {j in 1.._nvars: _var[j].slack < -1e-6} (_varname[j], _var[j].slack);
+
+      # Status info
+      display solve_result_num, solve_result, tolerance;
+
+      # Data variables
+      display card(figures), W, coords, height;
+      #display vp; 
+      #display lamda, alpha;
+
+      #break;
+   }
+
+   #display {i in 1.._ncons: _con[i].slack} (_conname[i], _con[i].slack);
+   #display {j in 1.._nvars: _var[j].slack} (_varname[j], _var[j].slack);
+
+   # option display_1col 20;
+   # option display_round 2;
+
+   # Status info
+   display solve_result_num, solve_result, tolerance;
+
+   # Data variables
+   display card(figures), W, coords, height;
+   
+   display distances;
+    
+   # Time stats
+   #display _ampl_time, _total_solve_time, _ampl_elapsed_time, _ampl_user_time;   
+
+   #printf "Total time elapsed: $%6.2f.\n", _total_solve_time;
+   #display _total_solve_time;
+
+   let tolerance := tolerance / 10;
+};
+
+quit;

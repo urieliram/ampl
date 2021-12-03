@@ -1,0 +1,8 @@
+# include museum.run;
+
+model museum.mod;
+data museum.dat;
+option solver cplexamp; #cplexstudent
+solve;
+display cost;
+display x;

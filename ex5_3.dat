@@ -1,0 +1,22 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set TRIMESTRES := 1 2 3 4;
+
+param d := ## demanda de los trimestres
+1 7000 
+2 15000 
+3 10000 
+4 8000 ; 
+
+param s0  := 5000 ; ## inventario_inicial
+
+param c1  := 2000 ; ## costo de produccion base
+param c2  := 2200 ; ## costo de produccion horas extra
+param c3  :=  100 ; ## costo de inventario
+
+param max1  := 10000 ; ## maxima producción costo base
+param max2  :=  2500 ; ## maxima producción costo horas extra

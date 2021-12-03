@@ -1,0 +1,19 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include FACTIBILITY.run;
+
+#LOAD THE MODEL
+model FACTIBILITY.mod;
+
+#LOAD THE MODEL
+data MCNFP.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+#expand pis, pi, pit ,a;
+
+display z, x, f, pi, alfa;

@@ -1,0 +1,16 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include SCOVERING.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model SCOVERING.mod;
+
+#LOAD .dat
+data  SCOVERING.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+solve;

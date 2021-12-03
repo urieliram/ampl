@@ -1,0 +1,24 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+# Ejercicio numero 14
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model prob22.mod;
+
+#LOAD .dat
+data prob22.dat;
+
+#CHANGE THE SOLVER
+option solver cplex;
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, X;
+

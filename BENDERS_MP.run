@@ -1,0 +1,20 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include BENDERS_MP.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model BENDERS_MP.mod;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display  Z, zb, y1 , y2; # res1,res2;
+expand Z,res1;
+#expand res1;
+#expand res2;

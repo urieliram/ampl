@@ -1,0 +1,37 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Precio de venta de minimesas 2000 u.m.
+## Precio de venta de minisillas 3000 u.m.
+## Tiempo de fabricación de una minimesa 2 horas
+## Tiempo de fabricación de una minisilla 3 horas
+## Jornada laboral máxima 10 horas
+## Costo de material de una minimesa 400 u.m.
+## Costo de material de una minisilla 200 u.m.
+## Total minisillas y minimesas no deben exceder cuatro unidades por día y operario
+
+set PRODUCTOS := minimesa minisilla ;  
+set RECURSOS  := produccion horas material; 
+ 
+param recurso:   produccion horas   material:=  
+      minimesa   1          2       400
+      minisilla  1          3       200; 
+
+param disponibilidad := produccion 4 
+                        horas      10 
+                        material   1200;  
+
+param beneficio := 
+      minimesa  2000 
+      minisilla 3000; 
+      
+## CPLEX 12.9.0.0: optimal integer solution; objective 10000
+## 2 MIP simplex iterations
+## 0 branch-and-bound nodes
+## Beneficios = 10000
+## X [*] :=
+## minimesa  2
+## minisilla  2

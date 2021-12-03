@@ -1,0 +1,23 @@
+##  VALOR/BENEFICIOS  1500	   3000   1000    2000	
+##  	              ARETES   IPAD	  JARRON  CELULAR  CAPACIDAD_MOCHILA
+##  PESO(g)	          20	   500	  750	  100	   1350
+##  TAMAÑO(cm2) 	  1	       600	  500	  53	   1153
+##  FRAGILIDAD (N)	  1	       10	  20	  3	       30
+			
+set OBJETOS   :=  ARETES	IPAD	JARRON	 CELULAR ;  
+set ATRIBUTOS :=  PESO  TAMANIO  FRAGILIDAD; 
+ 
+param beneficio := ARETES   1500 
+                   IPAD     3000 
+                   JARRON   1000   
+                   CELULAR  2000;
+                    
+param peso[tr]:             ARETES IPAD JARRON CELULAR:=
+            PESO	    20	   500	750	   100
+            TAMANIO 	1	   600	500	   53
+            FRAGILIDAD  1	   10	20	   3;
+
+param capacidad := 
+                   PESO       1350 
+                   TAMANIO    1153
+                   FRAGILIDAD 30; 

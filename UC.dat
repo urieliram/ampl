@@ -1,0 +1,89 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com     #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				                            #######
+#######  (Instancia obtenida de Anjos y Conejo 2017   				                #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+###########  SETS
+
+set T := 1 2 3 4 5 6 ;   ## Periods
+set J := 1 2 3 ;         ## Generation units
+set C := 1 ;             ## Linear pieces in the cost function of unit j 
+
+###########  PARAMETERS
+
+param Pmax := 1	300   ## The maximum power output unit j 
+			  2	200
+			  3	100 ; 	   
+
+param Pmin := 1	80     ## The minimum power output unit j
+			  2	50
+			  3	30 ; 	   
+
+param cU :=  1	800    ## The cost of starting up unit j in period t 
+			 2	500
+			 3	250;          
+
+param c  := 1	5      ## Cost of producing power generation j
+			2	15
+			3	30;       
+
+param De:= 1 240       ## The hourly load forecast 
+           2 250 
+           3 200 
+           4 170
+           5 230      # a) 230 b) 260
+           6 190;
+
+param R := 1 0       ## The spinning reserve requirements
+           2 10 
+           3 10 
+           4 10
+           5 10
+           6 10;       
+
+param alfa(tr) : 1  2  3 :=  ## Fixed coefficients of cost function of unit j 
+               1 5  15 30    ;     
+           
+param beta(tr) : 1 2 3 :=    ## Fixed coefficients of cost function of unit j 
+               1 0 0 0 ;     
+
+param RD   := 1	30       # a)30 c)50    ## Maximum ramp-down rate of unit j
+			  2	40
+			  3	50 ;      
+
+param RU   := 1	50       # a)50 c)60  ## Maximum ramp-up rate of unit j
+			  2	60
+			  3	70 ;    
+
+param SU   := 1	100          ## Maximum startup rate of unit j   
+			  2	70
+			  3	40 ;     
+			
+param SD   := 1	80           ## Maximum shutdown rate of unit j
+			  2	50
+			  3	30 ;     			
+
+param TU   := 1	3            ## Number of time periods that unit j is required to be on
+			  2	2
+			  3	1 ;  
+			  
+param TD   := 1	2           ## Number of time periods that unit j is required to be off
+		      2	2
+			  3	2 ;
+
+param U    := 1	2           ##  is the number of time periods that j is required to be on at the start of the planning horizon.
+			  2	0
+			  3	0 ;
+			
+param D    := 1	0        ## is the number of time periods that j is required to be off at the start of the planning horizon.
+			  2	0 
+			  3	0 ;
+			
+param v0   := 1	1        ## Condiciones iniciales
+			  2	0
+			  3	0 ;
+			
+param p0   := 1	120      ## Condiciones iniciales
+			  2	0
+			  3	0 ;		  

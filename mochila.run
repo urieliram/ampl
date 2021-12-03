@@ -1,0 +1,20 @@
+## PARA EJECUTAR USAR EL COMANDO
+##  include mochila.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model mochila.mod;
+
+#LOAD .dat
+data mochila.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display x , Beneficio, ResCapacidad;

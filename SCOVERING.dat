@@ -1,0 +1,16 @@
+#AMPL formulations of the set-covering problem
+
+set M := 1 2 3 4 5 ;         # {i}   CLIENTES
+set N := 1 2 3 ;             # {j}   DEPOSITOS
+  
+param c      :  1      2     3  :=
+      1         1      1     0  
+      2         1      1     0     
+      3         0      0     1     
+      4         0      1     1     
+      5         1      0     1  ;
+
+param f   := 
+      1 2
+      2 3
+      3 3;

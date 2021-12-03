@@ -1,0 +1,26 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 7
+## include ex7.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#Cargo MODEL o .mod
+model ex7.mod;
+
+#Cargo el .dat
+data ex7.dat;
+
+#Cambio el SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+##Ver valor de las variables
+display   Z, X, Y;

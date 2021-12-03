@@ -1,0 +1,37 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+# Ejercicio numero 14
+
+#   MAX Z = 800 X + 200 X2
+#            2  X -     X2 < 4    ...ec balance 1
+#            4  X +   3 X2 < 18   ...ec balance 2
+
+set PRODUCTOS   := VINO VINAGRE; 
+set BALANCES    := BAL1 BAL2   ; 
+
+param beneficio := VINO    800 
+                   VINAGRE 200 ;  
+ 
+param produccion[tr]: VINO VINAGRE :=  
+               BAL1   2    -1   
+               BAL2   4     3      ;
+
+param total := 
+      BAL1  4 
+      BAL2 18 ;      
+       
+# Resultado AMPL     
+# Z = 2800
+# X [*] :=
+# VINAGRE 2
+# VINO    3
+
+# minimize Z:
+#	800*X['VINO'] + 200*X['VINAGRE'];
+#subject to balances['BAL1']:
+#	2*X['VINO'] - X['VINAGRE'] >= 4;
+#subject to balances['BAL2']:
+#	4*X['VINO'] + 3*X['VINAGRE'] >= 18;

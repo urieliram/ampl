@@ -1,0 +1,21 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include SPP.run;
+
+#LOAD THE MODEL
+model SPP.mod;
+
+#LOAD THE MODEL
+data EXAM20.dat; #ejemplo roger
+
+#data SPP7.dat;  #ejemplo roger
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+#expand flow_balance;
+
+display z, x, pi, alfa;

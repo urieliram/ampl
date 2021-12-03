@@ -1,0 +1,36 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include ACNOPF.run;
+
+model ACNOPF.mod;
+data  ACNOPF.dat;
+
+#Se define el problema de ACNOPF sin perdidas
+problem ACOPF: iline_r, ig_r, iline_m, ig_m, Total_Cost, BalanceNode_r, BalanceNode_m, Ciclo_r, Ciclo_m,CurrentMax_r,CurrentMin_r,CurrentMax_m,CurrentMin_m;
+option loqo_options 'convex inftol=1e-6';
+option solver LOQO ; #LOQO:an interior point code for quadratic programming by Robert J. Vanderbei
+
+param SHUNTk{ BUS };
+param iter default 0;
+
+repeat { 
+
+	printf "\nITERATION %d\n", iter;
+	
+	let  {k in BUS} SHUNTk[k]:=
+	+ (sum{ m in BUS:(k,m) in BRANCH } shunt[k,m]) 
+	+ (sum{ i in BUS:(i,k) in BRANCH } shunt[i,k]) ;	
+			
+    #Se calculan las corrientes ibus
+    let {k in BUS} ibus_r[k] :=  dem_r[k] / e[k] ;
+    let {k in BUS} ibus_m[k] := (dem_m[k] / e[k] ) - SHUNTk[k] ;
+
+    let iter:=iter+1;
+    
+   	break;
+};
+
+display  ibus_r, ibus_m;
+
+#Se resuelve el problema de ACNOPF 
+solve ACOPF;
+display iline_r, ig_r, iline_m, ig_m;

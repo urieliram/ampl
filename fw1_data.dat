@@ -1,0 +1,12 @@
+# Data for the maximizing-rent example given in class
+
+set NODES := 1 2 3 4; 
+set ARCS :=  (1,2) (1,4) (2,4) (3,1) (3,2) (4,3);
+
+param: 	c :=	
+1 2    12
+1 4    2
+2 4    4
+3 1    1
+3 2    1
+4 3    3;

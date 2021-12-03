@@ -1,0 +1,16 @@
+
+set TRABAJADORES := m e;  
+set RECURSOS := a b; 
+
+param C := 
+      m   20000 
+      e  25000; 
+       
+param A:   a  b:= 
+      m    1  1
+      e   -1  2; 
+
+param D :=
+      m   30 
+      e   20;
+

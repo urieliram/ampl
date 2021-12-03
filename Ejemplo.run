@@ -1,0 +1,23 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include Ejemplo.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model Ejemplo2.mod;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+#display  X1,X2,X3,Z;
+display  x,Z;
+
+#display  Z, y1,y2,y3,y4,y5,y6,y7,res1,res2,res3;
+
+#display  Z, y1,y2,y3,y4,y5,y6, res1,res2;

@@ -1,0 +1,62 @@
+## PARA EJECUTAR USAR EL COMANDO
+## cd C:\GIT\AMPL\ampl
+## include UC_Network.run; 
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model UC_Network.mod;
+
+#LOAD DATA
+data UC_Network.dat;
+
+#SAVE SOLUTION
+#option auxfiles rc;
+#write mUC;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'mipsearch=1';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display   p , pb , v , y , z , 
+Const_Demand, 
+Const_Reserve , 
+#Const_Piecewise,
+Const_Unitstates0,
+Const_Unitstates,
+Const_RampingUp0,
+Const_RampingUp,
+Const_RampingDown0, 
+Const_RampingDown, 
+Const_Uptime, 
+Const_Downtime,
+Const_GenerationLimits,
+Const_GenerationLimits2,
+Const_GenerationLimits3,
+Const_GenerationLimits4_0,
+Const_GenerationLimits4,
+Const_GenerationLimits5 ;
+
+expand Z, 
+Const_Demand, 
+Const_Reserve , 
+#Const_Piecewise,
+Const_Unitstates0,
+Const_Unitstates,
+Const_RampingUp0,
+Const_RampingUp,
+Const_RampingDown0, 
+Const_RampingDown, 
+Const_Uptime, 
+Const_Downtime,
+Const_GenerationLimits,
+Const_GenerationLimits2,
+Const_GenerationLimits3,
+Const_GenerationLimits4_0,
+Const_GenerationLimits4,
+Const_GenerationLimits5 ;

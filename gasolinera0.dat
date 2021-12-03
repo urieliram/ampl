@@ -1,0 +1,33 @@
+# GAS_PRUEBA Instancia de prueba 0
+ 
+#Conjuntos
+ set T = 1 2 3  ;              
+ set P = 1 2 ;              
+ 
+# Demanda por turno 
+ param d := 
+1	13612.57
+2	10990.61
+3	13114.68
+ ;    
+# Inventario deseado al final del turno
+ param s := 
+1	65721.38
+2	65999.91
+3	71744.74
+;
+param Cmax:= 80000 ; # Capacidad maxima del tanque
+ 
+param Cmin:= 8000 ; # Capacidad minima del tanque
+ 
+param cp:= 1 15.00  # Costo por litro de la pipa
+                     2 14.00;
+                       
+param cs:= 30.00 ; # Costo por uso de un litro de reserva de inventario
+  
+param y0:= 55721.38 ;  #Nivel inicial del tanque al inicio de la planeación
+ 
+param pt:= 3; # Numero máximo de pipas por turno.
+
+param p:= 1 10000 # Litros por pipa 
+                   2 20000;

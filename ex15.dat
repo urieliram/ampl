@@ -1,0 +1,38 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+#######  CONJUNTOS
+set PRODUCTOS := CAMION_A CAMION_B AUTO_A AUTO_B;
+set RECURSOS := HORAS_A HORAS_B;
+
+#######  PARAMETROS
+param Beneficios :=
+    CAMION_A 6
+    CAMION_B 6
+    AUTO_A 2
+    AUTO_B 2
+;
+
+param CostosPorProducto:
+                CAMION_A	CAMION_B    AUTO_A      AUTO_B :=
+    HORAS_A 	7   		0           2           0
+    HORAS_B 	0		    3           0           3
+;
+
+param TotalCostos :=
+    HORAS_A 300
+    HORAS_B 270
+;
+
+Ganancias = 840
+
+# Resultados de AMPL
+# X [*] :=
+# AUTO_A  150
+# AUTO_B    0
+# CAMION_A    0
+# CAMION_B   90
+# ;

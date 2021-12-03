@@ -1,0 +1,32 @@
+model tableau.mod;
+data tableau.dat;
+
+problem Diet: Buy, Total_Cost, Diet_Req;
+solve Diet;
+
+#drop Tabl_Eqns; fix Tabl;
+#solve;
+
+display Buy.lb,Buy,Buy.ub;
+display Diet_Req.lb,Diet_Req.body,Diet_Req.ub;
+
+let BASIS := {j in FOOD: Buy[j].slack > .000001} union
+             {i in NUTR: Diet_Req[i].slack > .000001};
+
+# ------------------------------------------------------------------
+
+problem Tableau_Comp: Tabl, Tabl_Eqns;
+solve Tableau_Comp;
+
+#drop Total_Cost; drop Diet_Req; fix Buy;
+#restore Tabl_Eqns; unfix Tabl;
+#solve;
+
+param tabl_cost {j in COLS} := (if j in FOOD then cost[j] else 0);
+
+param reduced_cost {j in COLS diff BASIS} :=
+   tabl_cost[j] - sum {i in BASIS} tabl_cost[i] * Tabl[i,j].val;
+
+option display_eps .000001;
+option display_transpose -100000;
+display reduced_cost, Tabl;

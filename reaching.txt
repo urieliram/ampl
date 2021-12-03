@@ -1,0 +1,24 @@
+# An AMPL implementation of the reaching algorithm as described 
+# in "Network Flows: Theory, Algorithms, and Applications" by
+# Ahuja, Magnanti, and Orlin.
+
+# Requires: mcnfp_model.txt.
+# Assumes that the nodes have already been
+# labeled according to a topological ordering
+
+param d {NODES} default Infinity;
+param pred {NODES} default 0;
+
+
+let d[1] := 0;
+for {i in 1 .. card(NODES)} {
+  for {j in NODES: (i,j) in ARCS} {
+    if d[j] > d[i] + c[i,j] then {
+      let d[j] := d[i] + c[i,j];
+      let pred[j] := i;
+    } # end if d[j] > d[i] + c[i,j] then
+  }# end for {j in NODES: (i,j) in ARCS} 
+} # end for {i in 1 .. card(NODES)}
+
+display d;
+display pred;

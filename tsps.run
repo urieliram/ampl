@@ -1,0 +1,35 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include tsps.run;
+
+model tsps.mod;
+data  tsps.dat;
+
+set NEWSUB;
+set EXTEND;
+let nSubtours := 0;
+
+option solver cplexamp;
+
+repeat {
+
+   solve;
+
+   let NEWSUB := {};
+   let EXTEND := {member(ceil(Uniform(0,card(NODES))),NODES)};
+
+   repeat {
+      let NEWSUB := NEWSUB union EXTEND;
+      let EXTEND := {j in NODES diff NEWSUB: exists {i in NEWSUB}
+         ((i,j) in PAIRS and X[i,j] = 1 or (j,i) in PAIRS and X[j,i] = 1)};
+   } until card(EXTEND) = 0;
+
+   if card(NEWSUB) < card(NODES) then {
+      let nSubtours := nSubtours + 1;
+      let SUB[nSubtours] := NEWSUB;
+      display SUB;
+   } else break;
+};
+
+option omit_zero_rows 1;
+option display_1col 1000;
+display X;

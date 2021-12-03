@@ -1,0 +1,31 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+###########  SETS
+
+set I := 1 2 3 4 5 6 7;   ## Inversiones i
+
+###########  PARAMETERS
+
+param M:= 700; 	 ## Capital de inversión máximo
+
+param C:= 1 20   ## Costo de la inversión i
+          2 14 
+          3 10 
+          4 25
+          5 12     
+          6 19     
+          7 7;  
+            
+param R:= 1 31   ## Rédito de la inversión i  
+          2 25 
+          3 30
+          4 20
+          5 22   
+          6 5     
+          7 45;
+
+# T. C. T.C.Hu, Andrew B.Kahng. 2016. Linear and Integer Programming Made Easy-Springer International Publishing. ISBN 978-3-319-23999-6

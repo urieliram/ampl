@@ -1,0 +1,48 @@
+## Se implementa el argoritmo de Prim para encontrar el arbol de expansion minimo
+## include Prim.run;
+
+model DCNOPF.mod;
+data  DCNOPF.dat;
+
+set T dimen 2 default {};      # BRANCH
+set TV dimen 1 default {1};    # BUS
+set NTV dimen 1 default BUS;   # BUS
+set AUX dimen 2 default {};
+
+param d;
+param e;
+param rmin;
+param imin;
+param jmin;
+	
+repeat {
+
+	# Se eligen los arcos adyacentes
+	let AUX :=  { (u,v) in BRANCH: u in TV and v not in TV };
+		
+	# Se selecciona el arco de minima distancia en AUX 	
+	let jmin := Infinity;
+	for {(i,j) in AUX} 
+	{
+   		if j < jmin then 
+   		{
+      		let imin := i;
+      		let jmin := j;
+   		}
+	}		
+	
+	let AUX := { (imin,jmin) };
+		
+	let TV  := TV union {jmin};
+				
+	let T := T union {AUX} ;		
+		
+	#display AUX;
+	
+    let imin := 0;
+    let jmin := 0;
+	let AUX  := {};	
+	
+} while card(T) < (card(BUS)-1) ;
+
+	display T, TV;

@@ -1,0 +1,28 @@
+## TO EXECUTE USE THE COMMAND Gavish y Graves 
+##  include GG.run; 
+
+# RESET THE AMPL ENVIROMENT
+reset;
+
+# LOAD THE MODEL
+model GG.mod; 
+
+# LOAD .dat
+#data GG.dat;
+data TSP4.dat;
+
+# CHANGE THE SOLVER
+option solver cplexamp;
+
+# DEFINE PROBLEM
+problem GG: x, z, g, leaves, arrives, Gavish, Graves;
+option solver cplexamp; 
+
+# SOLVE PROBLEM
+solve GG; 
+
+# OUTPUT PRINT
+display x, g;
+
+# SHOW MODEL
+#expand  z, Gavish, Graves ;

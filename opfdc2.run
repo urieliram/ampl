@@ -1,0 +1,32 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include opfdc2.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model opfdc2.mod;
+
+#LOAD .dat
+data opfdc2.dat;
+
+#expand  Z,Balance_en_los_nodos,
+#Calculo_de_flujo_en_ramas,
+#Limite_de_flujo_en_ramas,
+#Limite_operativo_de_los_generadores_min,
+#Limite_operativo_de_los_generadores_max;
+
+
+#CHANGE THE SOLVER
+option solver        cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, p, y, del;
+
+#SHOW RESULT
+#Limites inferior, optimo,superior y variable dual de la variable
+#display x.lb, x, x.ub, x.rc;
+

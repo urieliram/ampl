@@ -1,0 +1,53 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include DIJKITER.run;
+
+model DIJKITER.mod;
+
+#data EXAM20alfa.dat; #EJEMPLO examen roger
+#data  DIJKITER.dat; #ejemplo de la clase de Roger
+data  AHUJA127b.dat; #ejemplo libro ahuja pag 127, ejecicio 4.14
+
+set P default {};	       # permanetly-labled nodes
+set T default NODES;       # nodes with temporary lables
+
+set CANDIDATES ordered default {}; # Nodes that can be moved from T to P
+
+param i;			                   # The next node to move from T to P
+
+param d {NODES} default Infinity;	   # distance labels
+param pred {NODES} default 0;		   # predecessor on shortest path
+
+
+param iter default 0;
+
+if min{(n1,n2) in ARCS} c[n1,n2] < 0 then {
+  printf "Dijkstra's no es aplicable porque... \n";
+  printf "...la red tiene arcos con costos negativos. \n"; 
+} else {
+
+let d[s0] := 0;
+repeat while card(P) < card(NODES) {
+  # Move a node with minimum d(i) from T to P
+  let CANDIDATES := { n1 in T: d[n1] == min{n2 in T} d[n2] };
+  let i := first(CANDIDATES);
+  let P := P union {i}; # permanetly-labled nodes
+  let T := T diff {i};  # nodes with temporary lables
+
+  for {j in T: (i,j) in ARCS}
+   if d[j] > d[i] + c[i,j] then {
+     let d[j] := d[i] + c[i,j];
+     let pred[j] := i;
+   }
+	printf "\n*********** ITERATION: %d***********\n", iter;
+	printf "\Nodo: %d\n", i;
+	printf "\distancia: %d\n", d[i];
+	printf "\predecesor: %d\n", pred[i];
+	printf "\Conjunto Permamente: "; display P;
+	printf "\Conjunto Temporal: "; display T;
+  let iter := iter + 1;
+};
+
+printf "*********** Resultado *********** \n"; 
+display d;
+display pred;
+}

@@ -1,0 +1,49 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 23
+
+# X1 Dimensión menor de una mesa
+# X2 Dimensión mayor de una mesa
+
+# MAX Z = 2 X + 2 X2
+# Sujeta a:
+# X       < 2
+#      X2 < 2
+# 2X + X2 < 4
+# X  , X2 > 0
+
+#######  CONJUNTOS
+set LADOS          := LARGO ANCHO;
+set REQUERIMIENTOS := REQUERIMIENTO_1 ;
+
+#######  PARAMETROS
+# Lado maximo
+# Ninguna dimension supera 2 m
+param maximalongitud := 
+			           LARGO 2
+			           ANCHO 2; 
+
+# numero de lados (entero)
+param numero:= 
+			   LARGO 2
+			   ANCHO 2;
+
+# Unico requerimiento de proporcion
+# La suma de la dimension mayor + dos veces la menor no sobrepase 4 m
+param proporciones[tr]:   LARGO  ANCHO :=
+       REQUERIMIENTO_1    2      1     ;
+
+param total:= 
+		     REQUERIMIENTO_1 4;
+		     
+# Resultado AMPL
+# PERIMETRO = 6
+# 
+# X [*] :=
+# ANCHO  2
+# LARGO  1
+;

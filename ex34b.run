@@ -1,0 +1,16 @@
+reset;
+
+#Cargar el MODEL o .mod
+model ex34b.mod;
+
+#Cargo el .dat
+data ex34b.dat
+
+#Cambiar el Solver
+option solver cplex;
+
+#SOLVE
+solve;
+
+#Ver valor de las variables
+display   X, Z;

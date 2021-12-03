@@ -1,0 +1,5 @@
+model 24.mod;
+data 24.dat;
+option solver cplexamp;
+solve;
+display profit, x;

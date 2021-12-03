@@ -1,0 +1,86 @@
+!
+!----------------------------------------------------------------
+!                      PARAMETROS CHT-AU-MDA
+!----------------------------------------------------------------
+!
+character*7, PARAMETER :: rut_ent = 'dirdat/' !Ruta de entrada de datos
+character*7, PARAMETER :: rut_res = 'dirres/' !Ruta de salida de datos
+REAL*8  , PARAMETER ::  Base = 100      ! Base para escalamiento
+INTEGER , PARAMETER ::  maxint = 170    ! Numero maximo de intervalos
+INTEGER , PARAMETER ::  maxurc = 300    ! Numero maximo de unidades de rango continuo
+INTEGER , PARAMETER ::  maxunpr = 550   ! Numero maximo de unidades no programables
+INTEGER , PARAMETER ::  maxurd = 100    ! Numero maximo de unidades de rango discontinuo
+INTEGER , PARAMETER ::  maxcompurd = 6  ! Numero maximo de componentes de unidades de rango discontinuo
+INTEGER , PARAMETER ::  maxure = 100    ! Numero maximo de unidades renovables
+INTEGER , PARAMETER ::  maxuh = 65      ! Numero maximo de unidades hidro
+INTEGER , PARAMETER ::  maxmodos = 10   ! Numero maximo de modos en unidades de rango discontinuo
+INTEGER , PARAMETER ::  maxdem = 6500   ! Numero maximo de ofertas de demanda
+INTEGER , PARAMETER ::  maxsegrc = 11   ! Numero maximo de segmentos de las ofertas de unidades de rango continuo
+INTEGER , PARAMETER ::  maxsegarrc = 7  ! Numero maximo de segmentos de los costos de arranque de unidades de rango continuo
+INTEGER , PARAMETER ::  maxsegarrd = 3  ! Numero maximo de segmentos de los costos de arranque de unidades de rango discontinuo
+INTEGER , PARAMETER ::  maxsegrd =  3   ! Numero maximo de segmentos de las ofertas de unidades de rango discontinuo
+INTEGER , PARAMETER ::  maxsegre =  3   ! Numero maximo de segmentos de las ofertas de unidades renovables
+INTEGER , PARAMETER ::  maxsegde =  3   ! Numero maximo de segmentos de las ofertas demanda
+INTEGER , PARAMETER ::  maxsegce =  3   ! Numero maximo de segmentos de las curvas de reserva para CENACE
+INTEGER , PARAMETER ::  maxgrure = 10   ! Numero maximo de grupos de reserva
+INTEGER , PARAMETER ::  maxgrute = 30   ! Numero maximo de grupos de unidades termicas con limitaciones de enrgia
+INTEGER , PARAMETER ::  maxsis = 1      ! Numero maximo de sistemas
+INTEGER , PARAMETER ::  maxnod = 9000   ! NUMERO MAXIMO DE NODOS ELECCTRICOS
+INTEGER , PARAMETER ::  minresup = 30   ! Minutos para reserva suplementaria
+INTEGER , PARAMETER ::  minresre = 10   ! Minutos para reserva regulacion secundaria
+INTEGER , PARAMETER ::  nmxemb = 20     ! Numero maximo de embalses
+INTEGER , PARAMETER ::  nmxpla = 30     ! Numero maximo de plantas hidro
+INTEGER , PARAMETER ::  DurIntAUTR = 15 ! Duracion en minutos del intervalo para el AUTR
+INTEGER , PARAMETER ::  maxzonproh = 4  ! Numero maximo de zonas prohibidas de operacion rango continuo e hidro
+INTEGER , PARAMETER ::  maxzondist = 10 ! Numero maximo de de zonas distribuidas para transacciones de imp/exp
+INTEGER , PARAMETER ::  maxnodist = 80  ! Numero maximo de nodos distribuidos para transacciones de imp/exp
+INTEGER , PARAMETER ::  maxare = 15     ! Numero maximo de areas gograficas
+INTEGER , PARAMETER ::  maxiteper = 10  ! Numero maximo de iteraciones para perdidas
+
+!-----------------------------------------------------------------
+!   DIMENSIONES DE LOS PROBLEMAS DE OPTIMIZACION
+!-----------------------------------------------------------------
+INTEGER , PARAMETER ::  maxvarMILP = 5000000    ! Numero maximo de variables en el problema de asignacion (MILP)
+INTEGER , PARAMETER ::  maxresMILP = 5000000    ! Numero maximo de restricciones en el problema de asignacion (MILP)
+!
+
+INTEGER , PARAMETER :: maxram  = 10000 ! Número máximo de ramas electricas
+     
+INTEGER , PARAMETER :: maxgen  = 100 ! Número máximo de generadores electricos
+       
+INTEGER , PARAMETER :: maxcar  = 10000 ! Número máximo de cargas
+      
+INTEGER , PARAMETER ::  maxgruram  = 300 ! Número máximo de grupos de ramas
+      
+INTEGER , PARAMETER :: maxelegruram  = 1000 ! Número máximo de elementos de grupos de ramas
+      
+INTEGER , PARAMETER ::  maxramnod  = 20 ! Número máximo de ramas por nodo
+      
+INTEGER , PARAMETER ::  maxres  = maxnod + 10 ! Número máximo de restricciones
+      
+INTEGER , PARAMETER ::  maxvar  = maxnod + 10 ! Número máximo de variables del problema lineal de flujos de DC
+      
+INTEGER , PARAMETER :: maxele  = 10*maxnod*maxramnod ! Número máximo de elementos no cero en matriz jacobiana de flujos de carga
+      
+INTEGER , PARAMETER ::  maxeleybus = maxnod*maxramnod ! Número máximo de elementos de ybus
+     
+INTEGER , PARAMETER :: maxisl = 5000 ! Número máximo de islas eléctricas
+
+INTEGER , PARAMETER :: maxregpre = 100 ! Número maximo de regiones de precios
+
+INTEGER , PARAMETER :: maxzoncar = 150 ! Número máximo de zonas de carga
+
+INTEGER , PARAMETER :: maxnodzoncar = 500 ! Número máximo de nodos por zonas de carga
+
+! Parametros hidro para el semanal
+INTEGER , PARAMETER ::  nmxvia = 30    ! Numero maximo de vias
+INTEGER , PARAMETER ::  nmxcue = 10    ! Numero maximo de cuencas
+INTEGER , PARAMETER ::  nmxuni = 100   ! Numero maximo de unidades hidro
+INTEGER , PARAMETER ::  nmxpmu = 9     ! Numero maximo de puntos de los modelos de gasto maximo y minimo para las unidades
+INTEGER , PARAMETER ::  nmxtiu = 30    ! Numero maximo de modlos de unidades hidro
+INTEGER , PARAMETER ::  nmxpme = 9     ! Numero maximo de puntos de los modelos para los embalses.
+INTEGER , PARAMETER ::  nmxinr = 24    ! Numero maximo de intervalos en retraso en via alguna
+INTEGER , PARAMETER ::  NMXPMD = 9     ! Numero maximo de puntos de los modelos para las vias de desfogue.
+INTEGER , PARAMETER ::  nmxcomp = 20    ! Numero maximo de compañias compra-venta de enrgia
+INTEGER , PARAMETER ::  nmxtrans = nmxcomp * 2    ! Numero maximo de transacciones comerciales   
+INTEGER , PARAMETER :: maxdia = 7     ! Numero maximo de dias 

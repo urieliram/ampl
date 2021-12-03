@@ -1,0 +1,114 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com    #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				                           #######
+#######  Instancia obtenida de Anjos y Conejo 2017   				                   #######
+#######  #######  #######  #######  #######  #######  #######   #######
+
+###########  SETS
+set T    := 1 2 3 4 5 6 ;   ## Periods
+set G    := 1 2 3 ;           ## Generation units
+set L[1] :=1, 2, 3;
+set L[2] :=1, 2, 3;
+set L[3] :=1, 2, 3;
+###########  PARAMETERS
+param C:= 		[1,*] 		1 5
+									2 5.1
+									3 5.2
+						[2,*] 		1 15
+									2 15.1
+									3 15.2
+						[3,*] 		1 30
+									2 30.1
+									3 30.2 ;
+param Pb:= 	[1,*] 		1 80
+									2 150
+									3 300 
+						[2,*] 		1 50
+									2 100
+									3 200
+						[3,*] 		1 30
+									2 50
+									3 100 ;
+param mpc  := 	1	400   ##  Minimum power cost
+			  				2	750
+			  				3	900 ; 	 
+param Pmin := 	1	80     ## The minimum power output unit j
+			  				2	50
+			  				3	30 ; 	 									
+param Pmax := 	1	300   ## The maximum power output unit j 
+			  				2	200
+			  				3	100 ;
+			  				
+param cU :=  1	800    ## The cost of starting up unit j in period t 
+			 			2	500
+			 			3	250;  
+			 			
+param c  := 	1	5      ## Cost of producing power generation j
+						2	15
+						3	30;    
+						
+param De:= 	1 240       ## The hourly load forecast 
+           				2 250 
+           				3 200 
+           				4 170
+           				5 230     # a) 230 b) 260
+           				6 190;
+
+param R := 	1 0       ## The spinning reserve requirements
+           				2 10 
+           				3 10 
+           				4 10
+           				5 10
+           				6 10;       
+
+param RD  := 1	30       # a)30 c)50    ## Maximum ramp-down rate of unit j
+			  			2	40
+			  			3	50 ;      
+
+param RU   := 1	50       # a)50 c)60  ## Maximum ramp-up rate of unit j
+			  			2	60
+			  			3	70 ;    
+
+param SU   := 1	100          ## Maximum startup rate of unit j   
+			  			2	70
+			  			3	40 ;     
+			
+param SD   := 1	80           ## Maximum shutdown rate of unit j
+			 			2	50
+			  			3	30 ;     			
+
+param UT   := 1	3            ## Number of time periods that unit j is required to be on
+			  			2	2
+			  			3	1 ;  
+			  
+param DT   := 1	2           ## Number of time periods that unit j is required to be off
+		      			2	2
+			  			3	2 ;
+
+param U    := 1	2           ##  is the number of time periods that j is required to be on at the start of the planning horizon.
+			  			2	0
+			  			3	0 ;
+			
+param D    := 	1	0        ## is the number of time periods that j is required to be off at the start of the planning horizon.
+			  			2	0 
+			  			3	0;
+			
+param u_0   := 	1	1        ## Condiciones iniciales
+			  				2	0
+			  				3	0 ;
+			
+param p_0   := 	1	120      ## Condiciones iniciales
+			  				2	0
+			  				3	0 ;		  
+			  			  
+param pc_0   := 1 	40      ## Condiciones iniciales
+			             	2	0
+			              	3	0 ;
+			              	
+param NPb   := 1 	9      ## Número máximo de arranques en el periodo
+			             	2	9
+			              	3	9 ;		  		  
+			  
+ ## Costo de penalización
+param CLP :=999999999999.0 ;      
+param CRP :=999999999999.0 ;      

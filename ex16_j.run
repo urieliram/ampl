@@ -1,0 +1,16 @@
+reset;
+
+#LOAD THE MODEL
+model ej16.mod;
+
+#Cargo el .dat
+data ej16.dat;
+
+#Cambio el SOLVER
+option solver cplex;
+
+#SOLVE
+solve;
+
+##Ver valor de las variables
+display   X, Z;

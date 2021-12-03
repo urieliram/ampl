@@ -1,0 +1,40 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include inversiones.run; 
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model inversiones2.mod;
+print "***** inversiones2.mod ********";
+
+#LOAD DATA
+data inversiones.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+option cplex_options (
+'presolve 0  ' &
+'timing 1  ' &
+'mipemphasis 0 ' & #  optimality vs feasibility
+'mipdisplay 5  ' &
+'mipinterval 1 ' &
+'presolve 0  ' &
+'mipcuts -1  ' &
+'cutpass -1 ' &
+'heurfreq -1 ' &
+'nodeselect 2 ' &
+'backtrack 0 ' &
+'MipGap 0.000000001 ' &   #Relative mipgap tolerance
+'FracCuts  -1 ' );  #Gomory cuts
+
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display x , y;
+
+expand Z, inversion_total, 2_solo_si_1, 3_solo_si_2, se_hara_si_1_y_2,no_si_1_o_2,no_si_2_y_3,solo_si_2_y_no_3;
+

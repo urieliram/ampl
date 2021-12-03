@@ -1,0 +1,36 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+# Ejercicio 11
+
+set PRODUCTO 	:= A B C D;
+set RECURSOS	:= a b c d e f;
+set RECURSOS1	:= g;
+
+param B := 
+	  A	700 
+	  B	500 
+	  C	700
+	  D 500;  
+ 
+param  U:  a	b	c	d	 e	f		:=  
+       A   3    0	1	0	 1	0		
+       B   2	0	0	1	 1  0   
+	   C   0	3   1	0    0  1   
+	   D   0    2   0   1    0  1 ;
+	   
+param  U1:  g	:=  
+	   A    9	
+       B    9
+	   C   -4
+	   D   -4;
+	     
+param T := 
+      a	500			
+      b	1200      
+	  c	800
+	  d	600
+	  e	400
+	  f 900;	      

@@ -1,0 +1,8 @@
+data;
+
+#set P := avion1 avion2;
+
+#param:	precio	costo :=
+#avion1	30000	900
+#avion2	20000	700;
+

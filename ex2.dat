@@ -1,0 +1,28 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+# Ejercicio numero 2
+
+#######  CONJUNTOS
+set PRODUCTO 	:= A B;
+set RECURSOS	:= a b c;
+
+#######  PARAMETROS
+param B := 
+	  A	1200 
+	  B	1400;
+	    
+ 
+param  U:  a	b	c	:=  
+       A   1    2	1	
+       B   2	1	1;
+	   
+	   
+	  
+param T := 
+      a	800			
+      b	800      
+	  c	500;
+	  	      

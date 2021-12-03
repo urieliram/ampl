@@ -1,0 +1,18 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set PRODUCTOS := A B;
+set PIENSO := P Q;
+
+param 	requerimiento: 	A B :=
+P		8		2	
+Q		10		5	;
+
+param: 	precio :=
+P	300
+Q	800;
+
+param disponibilidad := A 80 B 25; 

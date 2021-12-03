@@ -1,0 +1,103 @@
+## PARA EJECUTAR USAR EL COMANDO
+##  include LABELCOR.run;
+
+model LABELCOR.mod;
+#data  LABELCOR.dat;
+#data  MCNFP.dat;
+#data  residual4.dat;
+#data  SSPP.dat;
+#data  EXAM20alfa.dat;
+data  AHUJA127b.dat;
+
+set AUX dimen 2 default {};
+set CANDIDATES ordered default {}; # Nodes that can be moved from T to P
+
+param d{NODES} default Infinity;	   # distance labels
+param pred{NODES} default 0;		   # predecessor on shortest path
+
+param sigue default 0;      # criterio de paro
+param CM default 0;         # costo absoluto mas grande en la red
+param iter default 0;       # contador de iteraciones
+
+set P dimen 2 default {};
+set SP dimen 2 default {};
+set NSP ordered;   # Nodes on the shortest path from l to k
+
+let CM := max { (i,j) in ARCS } abs( c[i,j] )  ; 
+display CM;
+
+let d[s] := 0;
+
+repeat while sigue = 0
+{
+
+# Se eligen los arcos que todavia cumplen la condicion de no optimalidad
+let AUX :=  { (i,j) in ARCS: d[j] > d[i] + c[i,j] };
+
+  display AUX;
+	
+  if card(AUX) <> 0 then {
+  
+	  for {(i,j) in AUX} 
+		{	  
+	      let d[j] := d[i] + c[i,j];
+	      let pred[j] := i; 
+	      printf "arco:    %d %d\n", i, j;
+		  printf "distancia:  %d\n", d[j];
+		  printf "predecesor: %d\n", pred[j];
+		  
+		  if d[j] < -CM  then {	  
+	        printf ":-( ATENCION !!! Se ha encontrado un Ciclo Negativo\n\n ";
+	        let sigue := 1 ;
+		  }	 		  
+	      break; #solo se usa el primer elemento de AUX
+		}  
+	  
+   }else{
+  
+	   let sigue := 1 ;
+	   printf ":-) Se ha terminado el algoritmo correctamente \n\n ";
+  
+   }
+	
+  printf "*********** ITERATION: %d***********\n", iter;
+
+  let iter := iter + 1;
+};
+printf "\n*********** Resultado LABEL CORRECTING *********** \n"; 
+display d;
+display pred;
+
+# Se arma el conjunto de todos los arcos pertenecientes al SPP;
+let AUX := {}; let SP := {};
+for {i in NODES:i<>1} {
+let AUX := {(pred[i],i)};
+let SP := SP union {AUX};
+}  
+display SP;
+
+#Backtracking de nodo s a nodo t 
+let NSP := {t};
+repeat {
+  let NSP := NSP union {pred[last(NSP)]};
+} until s in NSP;
+display NSP;
+
+# let P denote a shortest path from node k to node l;
+let AUX := {}; let P := {};
+for {j in 0 .. card(NSP)-2} { # Backwards through NSP to find the arcs on the shortest path from k to l
+  let AUX := { (member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP)) };
+  let P := P union {AUX};
+}
+
+display P;
+
+printf "The shortest path from %d to %d has cost %d:\n",s,t,d[t];
+# Go backwards through NSP to find the arcs on the shortest path from s to t
+for {j in 0 .. card(NSP)-2} {
+  printf "From %d to %d:\t",member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP);
+  printf "Cost = %d\n",c[member(card(NSP) - j,NSP),member(card(NSP) - j - 1,NSP)];
+  }
+
+
+

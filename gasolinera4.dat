@@ -1,0 +1,69 @@
+## Gasolinera ATI REGULAR
+
+# Conjuntos
+ set T = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 ;              
+ set P = 1 2;              
+ 
+# Demanda por turno 
+ param d := 
+1	9917.389095
+2	7217.407213
+3	971.9626652
+4	8329.745497
+5	6683.221417
+6	1075.644635
+7	9469.362134
+8	7232.052333
+9	1098.594523
+10 8075.098754
+11 7071.353065
+12 1447.316849
+13 9644.798955
+14 6825.816885
+15 1141.144619
+16 6797.490207
+17 5219.511925
+18 1176.261856
+19 7184.803149
+20 5049.92963
+21 1018.086947
+;  
+# Inventario deseado al final del turno
+ param s := 
+1	42195.37052
+2	41747.34356
+3	41761.98868
+4	41888.62054
+5	41633.97379
+6	42022.10544
+7	42393.77766
+8	42569.21448
+9	42162.97903
+10 42205.52913
+11 40927.92058
+12 39076.07944
+13 38805.02445
+14 42712.10283
+15 42712.10283
+16 42712.10283
+17 42712.10283
+18 40012.62778
+19 39770.50111
+20 41013.61942
+21 42712.10283
+;
+param Cmax:= 100000; #76000 ; # Capacidad maxima del tanque
+ 
+param Cmin:= 8000 ; # Capacidad minima del tanque
+ 
+param cp:= 1 17.00  # Costo por litro de la pipa
+		   		       2 16.05;
+                                             
+param cs:= 30.00 ; # Costo por uso de un litro de inventario
+  
+param y0:= 17050.53 ;  #Nivel inicial del tanque al inicio de la planeación
+ 
+param pt:= 3 ; # Numero máximo de pipas por turno.
+
+param p:= 1 10000 # Litros por pipa 
+		          2 20000 ;

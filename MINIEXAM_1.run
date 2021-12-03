@@ -1,0 +1,20 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include MINIEXAM_1.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model MINIEXAM_1_BENDERS.mod;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display  Z, x1 , x2,  x3 , x4 , x5,  x6 , x7 , x8,  x3 , y1, y2, res1, res2, res3;
+expand res1;
+expand res2;
+expand res3;

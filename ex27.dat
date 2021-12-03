@@ -1,0 +1,34 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set TIPO_CALIDAD := A B;
+set RECURSOS :=  Lana Fibra Prendas;
+
+param Beneficios :=
+    A 1500
+    B 1000
+;
+
+param RecursosPorCalidad :
+            A	B :=
+    Lana	1   2
+    Fibra	2	1
+    Prendas	1	1
+;
+
+param TotalRecursos :=
+    Lana    180
+    Fibra   240
+    Prendas 1000
+;
+
+# Resultados de AMPL
+# Ganancias = 190000
+
+# X [*] :=
+# A  100
+# B   40
+# ;

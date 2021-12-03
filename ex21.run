@@ -1,0 +1,27 @@
+
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 21
+## include ex1.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex21.mod;
+
+#LOAD .dat
+data ex21.dat;
+
+#CHANGE THE SOLVER
+option solver cplex;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display X, Z;

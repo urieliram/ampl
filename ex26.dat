@@ -1,0 +1,60 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## INFORMACION
+## Inspector  Inspecciones/día   Precisión   Costo/hora   Costo_falla    Disponibilidad
+##         A  250*8=2000         98%         450          100            8
+##         B  150*8=1200         95%         350          100            10          
+##            18000/día
+
+#######  CONJUNTOS
+
+#  Nombre de Conjunto     # {indice usado en la ecuacion} Descripcion del conjunto.
+
+set INSPECTORES := A B ;  # {i} Tipos de inspectores
+
+#######  PARAMETROS
+
+param    salario      :=  # Salario de los inspectores
+      A  450
+      B  350 ;       
+
+param    porcentaje   :=  # Porcentaje de error por inspector
+      A  0.98
+      B  0.95 ;   	  
+
+param    inspecciones :=  # Cantidad de producto inspeccionado
+      A  250
+      B  150 ;
+      
+param    contratos :=  # Cantidad de contratos
+      A  8
+      B  10 ;       
+
+param costo_falla      := 100 ;
+param horas            := 8 ;
+param total_paraguas   := 18000 ;
+
+# ampl: include ex26.run;
+# minimize Costo:
+# 	4450*X['A'] + 6350*X['B'];
+# subject to Res_Contratos['A']:
+# 	X['A'] <= 8;
+# subject to Res_Contratos['B']:
+# 	X['B'] <= 10;
+# subject to Res_Inspecciones:
+# 	2000*X['A'] + 1200*X['B'] >= 18000;
+# CPLEX 12.9.0.0: sensitivity
+# CPLEX 12.9.0.0: optimal solution; objective 46183.33333
+# 0 dual simplex iterations (0 in phase I)
+# suffix up OUT;
+# suffix down OUT;
+# suffix current OUT;
+# :      X    Res_Contratos    :=
+# A   8          -6133.33
+# B   1.66667        0
+# ;
+# Costo = 46183.3

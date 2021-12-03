@@ -1,0 +1,96 @@
+## PARA EJECUTAR USAR EL COMANDO
+## cd C:\GIT\AMPL\ampl
+## include UC.run; 
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model UCP.mod;
+
+#LOAD DATA
+data UC.dat;
+#data UC_INS_10_12.dat;
+
+#SAVE SOLUTION
+#option auxfiles rc;
+#write mUC;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+option cplex_options 'mipdisplay=5';
+
+
+#Primero, eliminemos toda la tecnología CPLEX y resuelveremos nuestro problema usando un script AMPL:
+option presolve 0;
+#option cplex_options ('timing 1 mipdisplay 5 mipinterval 1 ' &
+#                      'presolve 0 mipcuts -1 cutpass -1 ' &
+#                      'heurfreq -1 ' &
+#                      'nodeselect 2 backtrack 0');
+                      
+#Quitar BFS                      
+option cplex_options ('timing 1 mipdisplay 5 mipinterval 1 ' &
+                      'presolve 1 mipcuts -1 cutpass -1 ' &
+                      'heurfreq -1 ');
+                      
+
+#Relax integrality without reformulating using option relax_integrality 1;
+#option relax_integrality 0; # (1) Activo
+
+#Definición de prioridad para las variables enteras
+#suffix priority IN, integer, >= 0, <= 9999;
+#let {j in J,t in T} v[j,t].priority := 0;
+#let {j in J,t in T} y[j,t].priority := 0;
+#let {j in J,t in T} z[j,t].priority := 0;
+
+#To control the direction of the branches we can create a new suffix for the direction we should branch on each variable 
+#(-1 for down, 0 for no preference, 1 for up).
+#suffix direction IN, integer, >= -1, <= 1;
+
+#We can force a down branch first:
+#let {j in J,t in T} v[j,t].direction := 0;
+#let {j in J,t in T} y[j,t].direction := 0;
+#let {j in J,t in T} z[j,t].direction := 0;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display   p , pb , v , y , z  ;
+#Const_Demand, 
+#Const_Reserve , 
+#Const_Piecewise,
+#Const_Unitstates0,
+#Const_Unitstates,
+#Const_RampingUp0,
+#Const_RampingUp,
+#Const_RampingDown0, 
+#Const_RampingDown, 
+#Const_Uptime, 
+#Const_Downtime,
+#Const_GenerationLimits,
+#Const_GenerationLimits2,
+#Const_GenerationLimits3,
+#Const_GenerationLimits4_0,
+#Const_GenerationLimits4,
+#Const_GenerationLimits5 ;
+
+expand Z, 
+Const_Demand, 
+Const_Reserve , 
+#Const_Piecewise,
+Const_Unitstates0,
+Const_Unitstates,
+Const_RampingUp0,
+Const_RampingUp,
+Const_RampingDown0, 
+Const_RampingDown, 
+Const_Uptime, 
+Const_Downtime,
+Const_GenerationLimits,
+Const_GenerationLimits2,
+Const_GenerationLimits3,
+Const_GenerationLimits4_0,
+Const_GenerationLimits4,
+Const_GenerationLimits5 ;

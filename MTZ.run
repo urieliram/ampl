@@ -1,0 +1,29 @@
+## TO EXECUTE USE THE COMMAND
+##  include MTZ.run;
+
+# RESET THE AMPL ENVIROMENT
+reset;
+
+# LOAD THE MODEL
+model MTZ.mod; 
+
+# LOAD .dat
+#data MTZ.dat;
+##data TSP4.dat;
+data TSP4.dat;
+
+# CHANGE THE SOLVER
+option solver cplexamp;
+
+# DEFINE PROBLEM
+problem MTZ: x, z, u, leaves, arrives, subtours, origen, origen2;
+option solver cplexamp; 
+
+# SOLVE PROBLEM
+solve MTZ; 
+
+# OUTPUT PRINT
+display x, u;
+
+# SHOW MODEL
+expand  z, subtours, origen, origen2 ;

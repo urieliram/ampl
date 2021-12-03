@@ -1,0 +1,45 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 44
+
+#######  CONJUNTOS
+
+set CONTRATISTAS := 1 2 3;
+set PROYECTOS := 1 2 3;
+
+#######  PARAMETROS
+
+param Costos :
+    1	2   3 :=
+1	280 360 380
+2	320 280 340
+3	360 300 400;
+
+param TotalDeProyectos :=
+    1   1
+    2   1
+    3   1;
+
+param TotalDeProyectosPorContratista :=
+    1   1
+    2   1
+    3   1;
+
+# Resultados de AMPL
+
+# TotalCostos = 920
+# X :=
+# 1 1   1 Se le asigna 1 proyecto de tipo 1 al contratista 1
+# 1 2   0
+# 1 3   0
+# 2 1   0
+# 2 2   0
+# 2 3   1 Se le asigna 1 proyecto de tipo 2 al contratista 3
+# 3 1   0
+# 3 2   1 Se le asigna 1 proyecto de tipo 3 al contratista 2
+# 3 3   0
+# ;

@@ -1,0 +1,40 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## INFORMACIÓN
+##             Proteínas Hidratos Grasas Costo/kg
+## Producto A  2         6        1      600
+## Producto B  1         1        3      400
+## Necesidades 8         12       9
+## (unidades)                 
+
+set PRODUCTOS := A B;
+set NUTRIENTES := Proteinas Hidratos Grasas;
+
+param Costos :=
+    A 600
+    B 400;
+
+param NutrientesPorProducto :
+                A	B :=
+    Proteinas	2	1
+    Hidratos	6   1
+    Grasas  	1	3;
+
+param Necesidades :=
+    Proteinas   8
+    Hidratos    12
+    Grasas      9;
+
+# Solucion
+# Z = 2600
+# X [*] :=
+# A  3
+# B  2
+# ;
+# XA= 3 Se deben utilizar 3 kg de producto A a la semana
+# XB= 2 Se deben usar 2 kg de producto A semanalmente
+# W*= 2600 Los costos mínimos en la semana son de 2600 u.m.

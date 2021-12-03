@@ -1,0 +1,41 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 59
+##  include ex59.run;
+
+## RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex59.mod;
+
+#LOAD .dat
+data ex59.dat;
+
+#CHANGE THE SOLVER
+option solver        cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, X;
+
+#SHOW RESULT
+#Limites inferior, optimo,superior y variable dual de la variable
+display X.lb, X, X.ub, X.rc;
+
+## Z = 820000
+## X [*] :=
+## EXTERIOR  2.3
+## INTERIOR  1.3
+## ;
+## :        X.lb    X      X.ub        X.rc        :=
+## EXTERIOR   0    2.3   Infinity   6.18456e-11
+## INTERIOR   0    1.3          2   2.54659e-11
+## ;

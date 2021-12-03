@@ -1,0 +1,37 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## INFORMACION
+## CAMIONES      NUMERO    CAPACIDAD    COSTO/VIAJE
+##       C1      6         15           4000 u.m.
+##       C2      10        5            3000 u.m.
+## Debe transportar 100 toneladas
+
+## X1 Número de camiones tipo i (i = 1, 2) que se utiliza
+
+set CAMIONES := camion1 camion2;  
+set RECURSOS := cap; 
+ 
+param A:         cap:= 
+      camion1    15
+      camion2    5; 
+
+param B :=  
+      cap 100;  
+
+param D :=
+      camion1  6 
+      camion2  10;
+
+param C := 
+      camion1  4000 
+      camion2  3000; 
+      
+## Z = 30000
+## X [*] :=
+## camion1  6
+## camion2  2
+## ;

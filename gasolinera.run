@@ -1,0 +1,62 @@
+## include gasolinera.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model gasolinera.mod;   # Modelo original
+#model gasolineraR.mod; # Reformulación
+
+#LOAD .dat 
+#data gasolinera0.dat; 	# GAS_PRUEBA, 		,,		time= ,	GAP=%, Z = 
+data gasolinera1.dat; 	# TEC_REGULAR, 	825867 MIP simplex iterations, 682344 branch-and-bound nodes, time=45.89, GAP=%, Z=2290450
+#data gasolinera2.dat; 	# COM_REGULAR, 	207 MIP simplex iterations, 107 branch-and-bound nodes,  time=0.015625 , 	GAP=5.63%, Z=450000 
+#data gasolinera3.dat; 	# DES_REGULAR, 	,, 	time= , 	GAP=%, Z = 
+#data gasolinera4.dat; 	# ATI_REGULAR, 		,,	time= , 	GAP=%, Z = 
+#data gasolinera5.dat; 	# CARR_DIESEL, 		,, 		time= , 	GAP=,%, Z = 
+#data gasolinera6.dat; 	# CARR_DIESEL, 		396 MIP simplex iterations, 157 branch-and-bound nodes, time 0.01, Z = 1620040, GAP=0.00%
+
+option cplex_options (
+'mipsearch 1 ' 		& # 1 Usa B&C; 0 Default; 2 dynamic search.
+'Threads 1 ' 			& # Se utiliza un número de hilos de procesamiento: 1-8.
+'mipdisplay 4  ' 		& # Muestra a detalle el log de la solucion: ( 0 a 5 )
+'mipinterval 0 ' 		& # Cuando es 2,,default 0 a more detailed log line is displayed
+'presolve 0  ' 			& # Se desactiva el preprocesamiento, con ( 0 )
+'timing 1  ' 				& # Tiempo del procesamiento
+'mipemphasis 0 ' 	& # Optimalidad vs factibilidad ( 0 )
+'mipcuts -1  ' 			& # Quitar cortes de todo tipo ( -1 )
+'cutpass -1 ' 			& # Desactivar todos los cortes, queda un B&B puro.
+'heurfreq -1 ' 			& # Frecuencia para aplicar la heurística
+'backtrack 0 ' 			& # Proporciona una búsqueda moderadamente amplia.
+'nodeselect 1 ' 		& # Criterio para elegir el siguiente nodo desde el cual ramicarse
+'FracCuts  -1 ' 			& # No generar cortes de Gomory(-1) ,  0 Si generar cortes, 1 moderado , 2 agresivo 
+'mipgap  .00001 '    & # | best node - best integer | / (1e-10 + | best integer |) < valor default 1.0e-4
+'absmipgap 0 '        & # | best node - best integer | < valor
+'varselect 0  '          & # default (i=0), Parte más fraccional con (1), parte menos fraccional con (-1)
+' '                             & # 
+' ' );
+
+#suffix priority IN, integer, >= 0, <= 9999;
+#suffix direction IN, integer, >= -1, <= 1;
+#let { i in T , j in P} x[i,j].priority := 5000;
+#let { i in T , j in P} x[i,j].direction := 1;
+
+#let { i in T } y[i].priority := 2000;
+#let { i in T } y[i].direction := 1;
+
+#let { i in T } u[i].priority := 0;
+#let { i in T } u[i].direction := 1;
+
+
+
+#CHANGE THE SOLVER
+option solver cplex;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, x, y, u;
+
+#Se muestra el modelo en forma extendida
+#expand Z,   limite_min, limite_max, balance_i,pipas_turno;

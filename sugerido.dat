@@ -1,0 +1,71 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+ set TURNOS = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21;              
+ 
+ #######  PARAMETROS
+ 
+# Demanda por turno Tecamachalco2
+ param d := 
+1	13612.57802
+2	13114.68306
+3	1299.615588
+4	13304.8788
+5	12985.13788
+6	1404.48925
+7	13672.10602
+8	12078.51826
+9	1744.805073
+10	14009.66124
+11	13622.41299
+12	1545.630631
+13	9647.111698
+14	8292.360904
+15	1717.711618
+16	6664.797897
+17	8723.03022
+18	1225.028623
+19	15201.45175
+20	12905.07917
+21	1431.753598;  
+  
+  # Inventario al final del turno Tecamachalco2
+ param s := 
+1	65721.38259
+2	65780.91059
+3	64744.74579
+4	65189.93528
+5	65894.71772
+6	66531.99283
+7	66673.13421
+8	62648.13989
+9	58861.98253
+10	58834.88908
+11	51490.02573
+12	46590.64297
+13	46270.04096
+14	66673.13421
+15	66673.13421
+16	66673.13421
+17	66673.13421
+18	66001.90257
+19	66065.4144
+20	62907.94652
+21	61331.03488; 
+ 
+ param Max:= 95000 ; #capacidad maxima del tanque
+ 
+ param Min:= 9500 ; #capacidad minima del tanque
+ 
+ param cp:= 1; #costo por litro de la pipa
+  
+ param cs:= 1.1 ; #costo por uso de un litro de inventario
+  
+ param y0:= 65721.3825894688 ; #nivel inicial  
+ 
+ param pt:= 1; # numero de pipas por turno
+
+ param p:= 20000;  #litros por pipa 

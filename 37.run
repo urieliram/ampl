@@ -1,0 +1,21 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include 37.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model 37.mod;
+
+#LOAD .dat
+#data PRUEBA.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display  X1,X2,X3,X4,X5,Z;

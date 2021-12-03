@@ -1,0 +1,37 @@
+#MINI EXAM Roger MCF 
+
+set NODES := 0 a b c d t ;
+
+set ARCS  := (0,a) 
+             (0,b) 
+             (a,c)
+             (b,a)
+             (b,d)
+             (c,b)
+             (c,d)
+             (c,t)
+             (d,t);
+             
+#param so:= s; #nodo fuente
+#param to:= t; #nodo destino 
+                    
+param:    b   :=
+   0     8   
+   a     0   
+   b     0   
+   c     0   
+   d     0   
+   t     -8    ;
+   
+   
+#	   cost	lower upper bound
+param: 	c 	l 	u   F   :=
+  0 a	10	0	5   3   #3
+  0 b	12	0	5   5   #5
+  a c	12	0	7   4   #4
+  b a	2	0	4   1   #1
+  b d	8	0	4   4   #4
+  c b	5	0	7   0   #0
+  c d	3	0	3   0   #0
+  c t	16	0	8   4   #4
+  d t	8	0	6   4  ;#4

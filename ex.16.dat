@@ -1,0 +1,23 @@
+## INFORMACION
+##                                HORAS REQUERIDAS
+## OPERACION                 Convencimiento  Trámites  BENEFICIOS
+## Captación de depósitos    1               1               1 * a
+##              Préstamos    1               2         (1+1/3) * a
+## Disponibilidad de tiempo  40              60
+
+set OPERACION := CAPTACION  PRESTAMOS;      # {i} Tipos de operación
+set RECURSOS  := CONVENCIMIENTO  TRAMITES;  # {i} Tipos de recursos
+
+param a := 1; # Factor de escala del beneficio
+
+param uso_recursos: CONVENCIMIENTO TRAMITES:=  # Beneficio unitario por cada operación
+      CAPTACION   1              1
+      PRESTAMOS   1              2 ; 
+             
+param beneficios:=  # Horas requeridas de los recursos por cada operacion
+      CAPTACION  1
+      PRESTAMOS  (1+1/3) ;
+
+param disponibilidad  :=  # Horas totales disponibles de cada recurso
+      CONVENCIMIENTO  40
+      TRAMITES        60 ;

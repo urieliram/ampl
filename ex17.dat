@@ -1,0 +1,39 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Una persona tiene 500000 u.m. para invertir en dos tipos de acciones A y B. El tipo A tiene
+## bastante riesgo con un interés anual del 10% y el tipo B es bastante seguro con un interés anual del
+## 7%. Decide invertir como máximo 300000 u.m. en A y como mínimo 100000 u.m. enB, e invertir en A
+## por lo menos tanto como en B, ¿Cómo deberá invertir sus 500000 u.m. para maximizar sus intereses
+## anuales?
+## ACCIONES INTERES
+## ANUAL
+## CONDICIONES DE INVERSION
+## A 10% No más de 300000 u.m. Por lo menos tanto como en B
+## B 7% No menos de 100000 u.m.
+
+set ACCIONES := A1 A2;
+set RECURSOS := a b c d; 
+ 
+param A:  a  b  c  d  :=  
+      A1  1  0  -1  1 
+      A2  0  -1  1  1; 
+
+param B := a 300000 
+           b 100000
+           c 0
+           d 500000; 
+
+param C := 
+      A1 0.1 
+      A2 0.07; 
+
+## Z = 44000
+## 
+## X [*] :=
+## A1  300000
+## A2  200000
+## ;

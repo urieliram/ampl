@@ -1,0 +1,20 @@
+## Ejercicio numero 2
+## include ex2.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex2.mod;
+
+#LOAD .dat
+data ex2.dat;
+
+#CHANGE THE SOLVER
+option solver cplex;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display X, Z;

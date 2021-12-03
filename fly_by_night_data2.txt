@@ -1,0 +1,19 @@
+# Data for the Max Flow formulation of the Fly-by-Night problem given in class
+# Note that to model a MAX FLOW PROBLEM as MCNFP, we add an arc from the sink to the source.
+# https://s2.smu.edu/~olinick/emis8374/handouts/fly_by_night_data2.txt
+
+set NODES := SF D H C A NY;
+set ARCS := (SF, D) (SF, H) (H,A) (D,A) (D,C) (C,NY) (A,NY) (NY,SF);
+
+param: 	u :=
+SF D	5
+SF H	6
+D C	2
+D A	4
+H A	5
+C NY	4
+A NY	7
+NY SF	Infinity;	# Return arc from the sink to the source
+
+param c :=
+NY SF -1;

@@ -1,0 +1,25 @@
+#######  #######  #######  #######  #######  #######  #######  #######
+#######               Uncapacity Facility Location             #######
+#######  Fuente:      Integer Programming                	   #######
+#######  Autor:       Laurenmce A. Wolsey       			   #######
+#######  Programador: Uriel Iram Lezama Lope				   #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				   #######
+#######  #######  #######  #######  #######  #######  #######  #######
+
+#######  Datos del problema.
+set M := 1 2 3 4 5 ;         # {i}   CLIENTES
+set N := 1 2 3 ;             # {j}   DEPOSITOS
+  
+param c (tr) :  1      2     3  :=
+      1    2      4     5  
+      2    3      3     4     
+      3    4      1     2     
+      4    5      2     1     
+      5    7      6     3  ;
+
+param f   := 
+      1 2
+      2 3
+      3 3;
+      
+      

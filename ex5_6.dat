@@ -1,0 +1,49 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 5.6
+
+set Productos := intermedio, intermedio_acaba, acabado; #{i}
+set Trabajadores := no_calificados, calificados; #{j}
+
+param Ingreso := intermedio             6.5,
+                 intermedio_acaba       15, 
+                 acabado                15;
+                 
+ param Cantidad_Trabajadores := no_calificados  2,
+                                calificados     1;
+ 
+ param Horas_Trabajadas :=      no_calificados  40,
+                                calificados     40;
+ 
+param Sueldo_Hora := no_calificados  0.4,
+                     calificados     0.6;
+                     
+param Gasto_Trabajo := no_calificados  1,
+                       calificados     2.4;
+                  
+param Horas_Produccion:           no_calificados   calificados  :=
+             intermedio           0.5              0.25
+             intermedio_acaba     0.5              0.75
+             acabado              0.6              0.5;
+  
+param Mano_Obra := no_calificados 80,
+                   calificados    40;
+                   
+param MaximoX := 
+              intermedio             150,
+              intermedio_acaba       infinity, 
+              acabado                infinity;
+              
+param MinimoX := 
+              intermedio             100,
+              intermedio_acaba       0, 
+              acabado                0;
+
+param Limite_Superior :=  no_calificados 20,
+                          calificados    10;
+                      
+            

@@ -1,0 +1,19 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set MOTOS := N U ;
+set RECURSOS := a b; 
+ 
+param A:  a    b :=  
+      N   0.5  1 
+      U   3    1; 
+
+param B := a 9 
+           b 8; 
+
+param C := 
+      N 2500 
+      U 4500; 

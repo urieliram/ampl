@@ -1,0 +1,21 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include MINFLOW.run;
+
+#LOAD THE MODEL
+model MINFLOW.mod;
+
+#LOAD THE MODEL
+#data MAXFLOW.dat;
+#data MCNFP.dat;
+data MINFLOW06.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+#expand pis, pi, pit ,a;
+
+display flujo, x, f, pis, pi, pit, alfa;

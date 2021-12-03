@@ -1,0 +1,39 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 50
+
+ set SECTORES  := BAB BTS;               
+ set PRIMARIOS := Mano_de_obra Capital;    
+ 
+ param Coef_Insumo_Producto : BAB  BTS :=
+                          BAB  0.10 0.10
+                          BTS  0.25 0.25 ;
+
+## También se dispone de los coeficientes de insumo de los factores primarios de mano de obra y capital:
+ param Coef_Insumos_Primarios[tr] : BAB BTS :=
+                       Mano_de_obra 4    3
+                            Capital 1.5  1.8 ;
+
+ param Disp_Primarios := Mano_de_obra 2000 
+                         Capital      600 ;
+
+## Los precios de mercado para los productos o bienes considerados son, respectivamente, de 1 y 1.5
+ param Precios :=   BAB 1
+                    BTS 1.5 ;
+                    
+##Resultado AMPL                   
+## Z = 481.203
+## X [*] :=
+## BAB   75.188
+## BTS  270.677
+## ;
+
+## :   X.lb      X        X.ub         X.rc        :=
+## BAB   0     75.188   Infinity   -2.22045e-16
+## BTS   0    270.677   Infinity   -2.22045e-16
+## ;
+                    

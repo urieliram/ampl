@@ -1,0 +1,27 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+set SEMANAS:= 1 2 3 4;
+
+param d   := 20000 ;   ## demanda de radios
+
+param pr  := 1 40      ## precio del producto por semana
+			 2 36 
+			 3 32 
+			 4 28 ; 
+			 
+param cr  := 1 5      ## costo de producción del producto por semana
+			 2 5 
+			 3 5 
+			 4 5 ; 
+
+param cb  := 2000 ;    ## costo empleado de base
+param ce  := 1000 ;    ## costo empleado eventual
+param cc  := 100  ;    ## costo por capacitación a nuevos empleados
+
+param  a  := 50 ;      ## maxima producción por empleado a la semana
+param  b  := 3  ;      ## maxima capacitación por empleado a la semana
+
+param  f  := 40 ;     ## numero de empleados fijos

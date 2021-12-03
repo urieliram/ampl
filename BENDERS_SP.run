@@ -1,0 +1,33 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include BENDERS_SP.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model BENDERS_SP.mod;
+
+#expand Z, res1 ,res2;
+#expand G, dua1 , dua2;
+
+#LOAD .dat
+#data PRUEBA.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display  Z, u1 , u2 , u3 , res1, res2, res4, res5, res6, res7, res8;
+expand Z;
+expand res1;
+expand res2;
+expand res3;
+expand res4;
+expand res5;
+expand res6;
+expand res7;
+expand res8;
+#display  G, u1, u2, u3 , dua1, dua2;

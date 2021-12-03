@@ -1,0 +1,5 @@
+model mcnfp_model.txt;
+data  nsc_data.txt;
+solve;
+display {(i,j) in ARCS: x[i,j] > 0} x[i,j];
+display cost + 1500*120;

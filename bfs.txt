@@ -1,0 +1,56 @@
+# An AMPL implementation of the Breadth-First Search algorithm
+# as described in AMO and in class.
+
+param pred {NODES} default 0;	     # The predecessor indices	
+
+param order {NODES} default 0;	     # The order in which the BFS visits
+                                     # the nodes. If order[i] = 0, then
+                                     # i is not yet marked.
+				     
+param next;			     # The lable to assign to the next
+                                     # node visited			   
+
+param i;			     # The node selected from LIST
+param j;			     # The unmarked node j selected from the
+                                     # neighbors of i
+
+set LIST ordered default {};	     # The list of marked nodes that 
+				                     # might still have admissible arcs.
+
+set CANDIDATES ordered default {};   # The set of unmarked nodes j such that
+                                     # (i,j) is an ARC.
+
+param s default 1;		     # The source (root) node for the search
+
+
+# Initialization
+
+let next := 1;
+let order[s] := 1;
+let LIST := {s};
+
+display LIST;
+repeat while card(LIST) > 0 {
+  # select the first node in LIST
+  let i := first(LIST);
+  display i;
+  
+  let CANDIDATES := {k in NODES: (i,k) in ARCS and order[k] == 0};
+  display CANDIDATES;
+  if card(CANDIDATES) == 0 then {
+   let LIST := LIST diff {i};
+  } else {
+   let j := first(CANDIDATES);
+   display j;
+   let pred[j] := i;
+   let next := next + 1;
+   let order[j] := next;
+   let LIST := LIST union {j};
+  }
+  display LIST;
+  printf "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n";
+};
+
+
+display order;
+display pred;

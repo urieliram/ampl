@@ -1,0 +1,54 @@
+# CONJUNTOS
+
+set U  := 1 2 ;       # Las unidades generadoras U que suministran potencia a los nodos conectados a los nodos i.
+
+set V  := 1 2 3;      # Los nodos eléctricos o buses, físicamente son subestaciones eléctricas.
+
+set E  := 1 2         # Las ramas eléctricas o líneas de transmisión que se conectan entre los nodos i,j y transmiten energía en MW:
+          2 3
+          3 1
+          2 1
+          3 2
+          1 3; 
+                   
+set UV := 1 1         # Conjuto de unidades u asociadas al nodo i 
+          2 2 ;     
+
+# PARAMETROS       
+
+ # La potencia máxima del generador u en MW 
+ # La potencia mínima del generador u en MW
+ # Costo de la unidad generadora
+param: gmin    gmax   c   :=
+    1  0.15    0.60   6.00	   
+    2  0.10    0.40   7.00;
+
+param  d :=              # La demanda en el nodo i (MW)
+  1    0.0
+  2    0.0
+  3	  0.85;
+       
+param B :                # La susceptancia de la rama E (1/ohms)
+      1	      2      3  :=
+1   0.0	    2.5    3.5
+2	2.5	    0.0    3.0
+3	3.5	    3.0    0.0;
+
+param fpmax :
+      1	       2        3:=  # La capacidad de flujo mínimo de la rama E (MW)
+1    0.0	  0.3      0.5
+2    0.3	  0.0      0.4
+3    0.5	  0.4      0.0;
+
+## Z = 5.35
+## :     X        del       :=
+## N1     .    0
+## N2     .    0.0345794
+## N3     .    0.146729
+## U1   0.6        .
+## U2   0.25       .
+## ;
+
+## :    X.lb    X    X.ub X.rc    :=
+## U1   0.15   0.6    0.6   0
+## U2   0.1    0.25   0.4   0

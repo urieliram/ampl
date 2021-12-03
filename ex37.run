@@ -1,0 +1,29 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## PARA EJECUTAR USAR EL COMANDO
+## include ex37.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex37.mod;
+
+#LOAD .dat
+data ex37.dat;
+
+expand Z, Limite_crudo_diario, Limite_recursos_Norefinados, Limite_recursos_Refinados;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display   x, y, Z, XT;
+## Multiplicar el resultado Z por 1000 barriles

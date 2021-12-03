@@ -1,0 +1,25 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include costos_reducidos_grafo.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model costos_reducidos_grafo.mod;
+
+#expand Z, res1 ,res2 , res3, res4, res5;
+#expand G, dua1 , dua2;
+
+#LOAD .dat
+#data PRUEBA.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+#display  Z, x1 , x2 , res2 , res3, res4, res5;
+
+display  W, pi1, pi2, pi3, pi4, pi5, dua1, dua2, dua3, dua4, dua5, dua6;

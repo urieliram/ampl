@@ -1,0 +1,13 @@
+reset;
+
+model ex44.mod;
+
+data ex44.dat;
+
+expand TotalCostos, Limit_Proyect, Limit_Proyect_Contrat;
+
+option solver cplexamp;
+
+solve;
+
+display TotalCostos, X;

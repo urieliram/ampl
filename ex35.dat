@@ -1,0 +1,39 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 35
+
+#######  CONJUNTOS
+set MAQUINA := A B C;
+set LISTON   := Chico  Mediano  Grande  Extra_Grande; 
+
+set A1  :=
+A Chico           A Mediano         A Grande           A Extra_Grande
+B Chico           B Mediano         B Grande           B Extra_Grande
+C Chico           C Mediano         C Grande           C Extra_Grande;
+
+#######  PARAMETROS 
+
+param   costo:  Chico    Mediano   Grande    Extra_Grande:=
+        A       30 	     30 	   30 	     30	
+        B       50 	     50 	   50 	     50	
+        C       80 	     80 	   80 	     80;   
+
+param   cant:          Chico      Mediano        Grande    Extra_Grande:=    
+        A              300        250            200       100   
+        B              600        400            350       200 
+        C              800        700            600       300;
+              
+param      Tiempo := 
+           A 50
+           B 50
+           C 50 ;
+
+param Disponibilidad := 
+      Chico        1000
+      Mediano      8000
+      Grande       6000
+      Extra_Grande 4000; 

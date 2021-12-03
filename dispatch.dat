@@ -1,0 +1,48 @@
+set UNIDADES := U1 U2 U3 ;
+set NODOS := N1 N2 ;
+set ESCENARIOS := H L ;
+
+param: MaxGen CostUnit CostResU CostResD :=
+    U1	50	10	16	15
+    U2	110	30	13	12        
+    U3	100	35	10	9 ;
+
+param CargaNodo  :=
+  N1	40
+  N2	100 ;
+
+param UbGen :
+    N1	N2  :=
+U1	1	0  
+U2	1	0
+U3  0	1 ;
+
+param NodosAdyacentes :
+    N1	N2  :=
+N1  0	1  
+N2	1	0 ;
+
+param Reactancia :
+    N1	N2	:=
+N1	0	0.13  
+N2	0.13	0 ;
+
+param CapacTransmision :
+    N1	N2	:=
+N1  0	100  
+N2	100	0 ;
+
+param PerdidaCarga := 200 ;
+
+param GenViento :=
+	N1  1
+	N2  0;
+
+param: ProbEsce VientoMax :=
+	H 	 0.6	50	
+	L 	 0.4	10 ;
+
+param VientoPron :=
+	N1 40
+	N2 0 ;
+	

@@ -1,0 +1,2161 @@
+!
+!**************************************************************************
+!******************************* CHAU *************************************
+!**************************************************************************
+!                                                                         *
+!       I N S T I T U T O   D E    I N V E S T I G A C I O N E S          *
+!                                                                         *
+!                       E L E C T R I C A S                               *
+!                                                                         *
+!      D I V I S I O N   D E   S I S T E M A S   E L E C T R I C O S      *
+!                                                                         *
+!    D E P A R T A M E N T O   D E   A N A L I S I S   D E   R E D E S    *
+!                                                                         *
+!**************************************************************************
+!                                                                         *
+!     Propósito:                                                          *
+!         Lee datos de generadores con rangos continuos de                *
+!         operacion y relaciona unidades de                               *
+!         de generacion con los subsistemas                               * 
+!                                                                         *
+!     Nombre y fecha de implementación:                                   *
+!        DR. JUAN ALVAREZ LOPEZ     Noviembre 2014                        *
+!                                                                         *
+!                                                                         *
+!     Nombre y fecha de revision(es):                                     *
+!                                                                         *
+!**************************************************************************
+    
+SUBROUTINE data_rd
+
+use ParAUHE, only: rut_dat_1, long_ruta, bmensaje, nombunird, proprd, &
+                  numnodos, numsis, nodo_subsis, EstadoIsla, IslaGenRD, &
+                  nomsis, unidadrd_area_rd, nodo_area, maxurd, NumCompRD, &
+                  ListCompURD, maxcompurd, tiunidrd, corresprd, ApunCompURD, NumUniRD, &
+                  nombcomurd, ticompurd, nodocompurd, TransFacti, maxmodos, NumModRD, CostoMinGRD, &
+                  ntintr, PreVenEnerRD, OferVenEnerRD, maxsegrd, Base, NumBloVRD, PotMinGRD, PotMaxGRD, &
+                  EstadoCIURD, NumHCIURD, GenCIURD, PotSincURD, PotSincNR10URD, PotSincNRSURD, RampArraURD, &
+                  durintr, TminModoURD, NumMaxTrans, TiempoTrans, CostoTrans, AsignURD, TiemInicioArrRDS, &
+                  CostoArrRDS, maxsegarrd, NmBloArrURD, RampaBajURD, RampaSubURD, RamEmer10RD, RamEmerxRD, &
+                  RamRegRD, minresre, minresup, OferResR10RD, PreVenResR10RD, PreVenResRxRD, OferResRxRD, &
+                  OferResRegRD, PreVenResRegRD, OferResNR10RD, PreVenResNR10RD, PreVenResNRxRD, OferResNRxRD, &
+                  UniGruResRD, maxgrure, CompXModo, NumCompXModo, GenCompXModo, maxgrute, UniGruTerRD, maxint, &
+                  maxcompurd, maxurd, NomEjecu, SisUniRD, PotMinRRD, PotMaxRRD, DispoURD
+
+use ProblemaAUHE
+
+IMPLICIT NONE
+
+integer ierror, ierror_1, ierror_2, ibanbit, dummy, unidad, componente, i, nodo, subsistema, &
+        componentes ( maxcompurd ), NodoV ( maxcompurd * maxurd, maxint ), consecutivo, TempNumComp, &
+        columna, contador, fila, bloque, k, modo, segmento, intervalo, numseg, modo_prev, auxiliar ( maxgrure ), &
+        zona, componente_1, grupo, auxiliar_1 ( maxgrute )
+
+CHARACTER fecha_Ej*19
+
+character*3000 letaux, letaux_1, letaux_2
+
+character*20 propietario, nombre, NombreV ( maxcompurd * maxurd )
+             
+
+character*7 tipo, TipoV ( maxcompurd * maxurd )
+
+logical entro
+
+real*8 rampaup, rampadown, emergencia, regulacion, regimen
+
+!Inicializacion de variables
+
+unidad = 0
+componente = 0
+nombunird = ''
+tipo = ''
+propietario = ''
+proprd = ''
+i = 0
+ListCompURD = 0
+NumModRD = 0
+TransFacti = 0
+DispoURD = 0
+TiempoTrans = 0
+TiemInicioArrRDS = 0 
+CostoArrRDS = 0.0
+MrreURD = 0.0
+
+!
+! ---------------------------------
+! * Se leen datos de COMPOURD      *
+! * Se leen datos de NODOSCOMPOURD *
+! ---------------------------------
+
+OPEN (UNIT = 73, FILE = rut_dat_1( 1 : long_ruta )//'COMPOURD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+OPEN (UNIT = 196, FILE = rut_dat_1( 1 : long_ruta )//'NODOSCOMPOURD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )        
+	    read ( 73, 100, iostat = ierror ) letaux
+        read ( 196, 100, iostat = ierror ) letaux_1
+	    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+            i = i + 1
+            read ( letaux, * )  NombreV ( i ), TipoV ( i ) !, NodoV ( i )
+            read ( letaux_1, * )  ( NodoV ( i, intervalo ), intervalo = 1, ntintr )
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO COMPOURD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 73 )
+CLOSE ( UNIT = 196 )
+
+ierror = 0
+i = 0
+auxiliar = 0
+!
+! ---------------------------------
+! * Se leen datos de UNITRD      *
+! * Se leen datos de ZONASRESURD *
+! * Se leen datos de GPORD      *
+! ---------------------------------
+
+consecutivo = 1
+OPEN (UNIT = 72, FILE = rut_dat_1( 1 : long_ruta )//'UNITRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+OPEN (UNIT = 99, FILE = rut_dat_1( 1 : long_ruta )//'ZONASRESURD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+OPEN (UNIT = 118, FILE = rut_dat_1( 1 : long_ruta )//'GPORD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )        
+	    read ( 72, 100, iostat = ierror ) letaux
+        read ( 99, 100, iostat = ierror ) letaux_1
+        read ( 118, 100, iostat = ierror ) letaux_2
+	    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. len_trim(letaux_1) .ne. 0 .and. len_trim(letaux_2) .ne. 0 ) then
+            i = i + 1
+            read ( letaux, * )  nombre, tipo, propietario, dummy, TempNumComp, ( componentes ( componente ), componente = 1, TempNumComp )
+            read ( letaux_1, * )  ( auxiliar ( zona ), zona = 1, maxgrure )
+            read ( letaux_2, * )  ( auxiliar_1 ( grupo ), grupo = 1, maxgrute )
+            !Hacer para todos los nodos
+            do nodo = 1, NumNodos
+                !se asigna subsistema con el nodo del primer intervalo
+                if ( NodoV ( componentes ( 1 ), 1 ) .eq. nodo ) then
+                    !Hacer para todos los subsistemas
+                    do subsistema = 1, numsis
+                        if ( nodo_subsis ( nodo ) .eq. nomsis ( subsistema ) ) then
+                            !Ver si el subsistema esta activo
+                            if ( EstadoIsla ( subsistema ) .eq. 1 ) then
+                                unidad = unidad + 1
+                                IslaGenRD ( unidad ) = subsistema
+                                !se asigna area con el nodo del primer intervalo
+                                unidadrd_area_rd ( unidad ) = nodo_area ( nodo )
+                                nombunird ( unidad ) = nombre
+                                tiunidrd ( unidad ) = tipo
+                                proprd ( unidad ) = propietario
+                                corresprd ( unidad ) = i
+                                UniGruResRD ( unidad, : ) =  auxiliar
+                                UniGruTerRD ( unidad, : ) =  auxiliar_1
+                                NumCompRD ( unidad ) = TempNumComp
+                                ApunCompURD ( unidad ) = consecutivo
+                                !Hacer para todas las componentes de la unidad de rango discontinio
+                                do componente = 1, TempNumComp
+                                    ListCompURD ( consecutivo ) = componentes ( componente )
+                                    nombcomurd ( consecutivo ) = NombreV ( componentes ( componente ) )
+                                    ticompurd ( consecutivo ) = TipoV ( componentes ( componente ) )                                    
+                                    nodocompurd ( consecutivo, : ) = NodoV ( componentes ( componente ), : )
+                                    consecutivo = consecutivo + 1
+                                end do
+                                exit
+                            end if
+                        end if
+                    end do
+                end if
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO UNITRD.csv / ZONASRESURD.csv / GPORD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+!Numero de unidades de rango discontinuo
+
+NumUniRD = unidad
+
+SisUniRD = i
+
+CLOSE ( UNIT = 72 )
+CLOSE ( UNIT = 99 )
+
+
+ierror = 0
+i = 0
+
+!Escribe a debugger los datos de unidades de rango discontinuo
+write ( 1, 100 ) '------------------------------' 
+write ( 1, 100 ) 'UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre         Tipo  Propietario    Area        Subsistema'
+    write ( 1, 200 ) unidad, nombunird ( unidad ), tiunidrd ( unidad ), proprd ( unidad ),  unidadrd_area_rd ( unidad ), nomsis ( IslaGenRD ( unidad ) )
+    !hacer para todas las componentes de la unidad de rango discontinuo
+    write ( 1, 100 ) '  Componente  Nombre        Tipo   Nodo'
+    do componente = 0, NumCompRD ( unidad ) - 1
+        write ( 1, 300 ) ListCompURD ( ApunCompURD ( unidad ) + componente ), nombcomurd ( ApunCompURD ( unidad ) + componente ), ticompurd ( ApunCompURD ( unidad ) + componente ), nodocompurd ( ApunCompURD ( unidad ) + componente, 1 )
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+
+!Escribe a debugger los datos de unidades de rango discontinuo
+write ( 1, 100 ) '------------------------------------------------------' 
+write ( 1, 100 ) 'NODOS DE COMPONENTES DE UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '------------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD    
+    !hacer para todas las componentes de la unidad de rango discontinuo
+    do componente = 0, NumCompRD ( unidad ) - 1
+        bloque = ntintr / 24
+        do k = 1, bloque
+            write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+            write ( 1, 2500 ) ListCompURD ( ApunCompURD ( unidad ) + componente ), nombcomurd ( ApunCompURD ( unidad ) + componente ), ( nodocompurd ( ApunCompURD ( unidad ) + componente, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+        end do
+        if ( ntintr - 24 * bloque .gt. 0 ) then
+            write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+            write ( 1, 2500 ) ListCompURD ( ApunCompURD ( unidad ) + componente ), nombcomurd ( ApunCompURD ( unidad ) + componente ), ( nodocompurd ( ApunCompURD ( unidad ) + componente, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+        end if
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+!
+! ---------------------------------
+! * Se leen datos de TRANSRD      *
+! ---------------------------------
+consecutivo = 1
+OPEN (UNIT = 74, FILE = rut_dat_1( 1 : long_ruta )//'TRANSRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 74, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( TransFacti ( consecutivo, 1, columna ), columna = 1, maxmodos )
+                do contador = 2, maxmodos
+                    read ( 74, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( TransFacti ( consecutivo, contador, columna ), columna = 1, maxmodos )
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 74, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO TRANSRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 74 )
+
+ierror = 0
+i = 0
+
+!Se calculan los numeros de modos para las unidades de rango disncontino
+!Hacer para todas las unidades de rango discontinio
+do unidad = 1, NumUniRD
+    !Hacer para todas las filas
+    do fila = 1, maxmodos
+        !Hacer para todas las columnas        
+        do columna = 1, maxmodos
+            if ( TransFacti ( unidad, fila, columna ) .eq. 1 ) then
+                if ( NumModRD ( unidad ) .lt. columna ) then
+                    NumModRD ( unidad ) = columna
+                end if
+            end if
+        end do
+    end do    
+end do
+
+!Imprime a debugger transiciones
+
+write ( 1, 100 ) '----------------------------------------------------' 
+write ( 1, 100 ) 'TRANSICIONES FACTIBLES UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '----------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre'
+    write ( 1, 200 ) unidad, nombunird ( unidad )
+    !Hacer para todas las filas
+    do fila = 1, NumModRD ( unidad )
+        write ( 1, 500 ) ( TransFacti ( unidad, fila, columna ), columna = 1, NumModRD ( unidad ) )
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+!
+! ---------------------------------
+! * Se leen datos de COMPXMODO    *
+! * Se leen datos de GECOXMOD     *
+! ---------------------------------
+consecutivo = 1
+OPEN (UNIT = 100, FILE = rut_dat_1( 1 : long_ruta )//'COMPXMODO.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+OPEN (UNIT = 101, FILE = rut_dat_1( 1 : long_ruta )//'GECOXMOD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. len_trim(letaux_1) .ne. 0  )  
+        read ( 100, 100, iostat = ierror ) letaux
+        read ( 101, 100, iostat = ierror ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( CompXModo ( consecutivo, 1, columna ), columna = 1, maxcompurd )
+                read ( letaux_1, * )  ( GenCompXModo ( consecutivo, 1, columna ), columna = 1, maxcompurd )
+                do contador = 2, maxmodos
+                    read ( 100, 100, iostat = ierror ) letaux
+                    read ( 101, 100, iostat = ierror ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( CompXModo ( consecutivo, contador, columna ), columna = 1, maxcompurd )
+                        read ( letaux_1, * )  ( GenCompXModo ( consecutivo, contador, columna ), columna = 1, maxcompurd )
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 100, 100, iostat = ierror ) letaux
+                read ( 101, 100, iostat = ierror ) letaux_1
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO COMPXMODO.csv / GECOXMOD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 100 )
+CLOSE ( UNIT = 101 )
+
+ierror = 0
+i = 0
+
+NumCompXModo = 0
+!Se calculan el numero de componentes por modo para las unidades de rango disncontino
+!Hacer para todas las unidades de rango discontinio
+do unidad = 1, NumUniRD
+    !Hacer para todas las filas
+    do fila = 1, maxmodos
+        !Hacer para todas las columnas        
+        do columna = 1, maxcompurd
+            if ( CompXModo ( unidad, fila, columna ) .ne. 0 ) then
+                NumCompXModo ( unidad, fila ) = NumCompXModo ( unidad, fila ) + 1
+            end if
+        end do
+    end do    
+end do
+
+!Se Escriben a debugger los datos de las componentes por modo de unidades de rango discontinuo
+write ( 1, 100 ) '------------------------------------------------------' 
+write ( 1, 100 ) 'COMPONENTES POR MODO DE UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '------------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre   Tipo'
+    write ( 1, 200 ) unidad, nombunird ( unidad ), tiunidrd ( unidad )
+    !Hacer para todos los modos
+    do modo = 1, NumModRD ( unidad )
+        write ( 1, 800 ) 'Modo', modo 
+        write ( 1, 100 ) '    Componete  Nombre      Tipo    Nodo   % Gen'
+        !Hacer para todas la componentes de modo
+        do componente = 1, NumCompXModo ( unidad, modo )
+            !Buscar componente del modo en la lista de componentes de la unida de rango discontinuo
+            !Hacer para todas la componentes de la unida de rango discontinuo
+            do componente_1 = 0, NumCompRD ( unidad ) - 1
+                if ( CompXModo ( unidad, modo, componente ) .eq. ListCompURD ( ApunCompURD ( unidad ) + componente_1 ) ) then
+                    write ( 1, 301 ) ListCompURD ( ApunCompURD ( unidad ) + componente_1 ), nombcomurd ( ApunCompURD ( unidad ) + componente_1), ticompurd ( ApunCompURD ( unidad ) + componente_1 ), nodocompurd ( ApunCompURD ( unidad ) + componente_1, 1 ), GenCompXModo  ( unidad, modo, componente )
+                    exit
+                end if
+            end do
+        end do
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+consecutivo = 1
+! ------------------------------
+! * Se leen datos de CGMRD *
+! ------------------------------
+write ( 1, 100 ) '--------------------------------------------------------'
+write ( 1, 100 ) 'COSTO DE GENERACION MINIMO UNIDADES DE RANGO DISCONTINUO'
+write ( 1, 100 ) '--------------------------------------------------------'
+OPEN (UNIT = 75, FILE = rut_dat_1( 1 : long_ruta )//'CGMRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 75, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( CostoMinGRD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 700 ) consecutivo, nombunird ( consecutivo ), ( CostoMinGRD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 700 ) consecutivo, nombunird ( consecutivo ), ( CostoMinGRD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 75, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( CostoMinGRD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 900 ) ( CostoMinGRD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 900 ) ( CostoMinGRD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 75, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO CGMRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 75 )
+
+write ( 1, 100 ) ''
+
+ierror = 0
+ierror_1 = 0
+i = 0
+unidad = 1
+! ------------------------------
+! * Se leen datos de POTVERD *
+! * Se leen datos de PREVERD *
+! ------------------------------
+write ( 1, 100 ) '-----------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE VENTA DE ENERGIA UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '-----------------------------------------------------'
+
+OPEN (UNIT = 76, FILE = rut_dat_1( 1 : long_ruta )//'POTVERD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+OPEN (UNIT = 77, FILE = rut_dat_1( 1 : long_ruta )//'PREVERD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )        
+	    read ( 76, 100, iostat = ierror ) letaux
+        read ( 77, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        entro = .false.
+        if ( corresprd ( unidad ) .eq. i ) then
+            !Hacer para todos los modos de operación
+            do modo = 1, maxmodos
+                segmento = 1
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                    if ( entro .eq. .false. ) then
+                        entro = .true.
+                        read ( letaux, * )  ( OferVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                    else
+                        read ( 76, 100, iostat = ierror ) letaux
+                        read ( 77, 100, iostat = ierror_1 ) letaux_1
+                        read ( letaux, * )  ( OferVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                    end if
+                    !Hacer para los segmentos del segundo en adelante
+                    do segmento = 2, maxsegrd
+                        read ( 76, 100, iostat = ierror ) letaux
+                        read ( letaux, * )  ( OferVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                        read ( 77, 100, iostat = ierror_1 ) letaux_1
+                        read ( letaux_1, * )  ( PreVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 1, ntintr )
+                    end do                    
+                end if
+            end do
+            unidad = unidad + 1
+        else
+            do consecutivo = 1, ( maxmodos * maxsegrd ) - 1
+                read ( 76, 100, iostat = ierror ) letaux
+                read ( 77, 100, iostat = ierror_1 ) letaux_1
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTVERD.csv / PREVERD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 76 )
+CLOSE ( UNIT = 77 )
+
+!Escribir a bitacora
+!Hacer para todas las unidades
+do unidad = 1, NumUniRD
+    !Hacer para todos los bloques de 24 intervalos
+    bloque = ntintr / 24
+    do k = 1, bloque
+        write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+        !Hacer para todos los modos de operacion
+        do modo = 1, NumModRD ( unidad )
+            !Hacer para todos los segmentos
+            write ( 1, 800 ) 'Modo', modo
+            do segmento = 1, maxsegrd
+                write ( 1, 800 ) 'Seg:', segmento
+                write ( 1, 1000 ) unidad, nombunird ( unidad ), 'MW', ( OferVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                write ( 1, 1000 ) unidad, nombunird ( unidad ), '$/MWh', ( PreVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+            end do        
+        end do
+    end do
+    
+    if ( ntintr - 24 * bloque .gt. 0 ) then
+        write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+        !Hacer para todos los modos de operacion
+        do modo = 1, NumModRD ( unidad )
+            write ( 1, 800 ) 'Modo', modo
+            !Hacer para todos los segmentos
+            do segmento = 1, maxsegrd
+                write ( 1, 800 ) 'Seg:', segmento
+                write ( 1, 1000 ) unidad, nombunird ( unidad ), 'MW', ( OferVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                write ( 1, 1000 ) unidad, nombunird ( unidad ), '$/MWh', ( PreVenEnerRD ( unidad, modo, segmento, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+           end do
+        end do
+    end if
+end do
+
+!Escalamiento
+OferVenEnerRD = OferVenEnerRD / Base
+PreVenEnerRD = PreVenEnerRD * Base
+
+!Calcular cuantos segmentos se ofertaron por unidad, por modo de operacion y por intervalo
+do unidad = 1, NumUniRD
+    !Hacer para todos los intervalos
+    do intervalo = 1, ntintr
+        !Hacer para todos los modos de operacion
+        do modo = 1, NumModRD ( unidad )
+            numseg = 0
+            !Hacer para todos los segmentos
+            do segmento = 1, maxsegrd
+            !Encontrar segmento con oferta de potencia cero
+                if ( OferVenEnerRD ( unidad, modo, segmento, intervalo ) .ne. 0 ) then
+                    numseg = numseg + 1
+                else
+                    if ( segmento .eq. 1 .and. OferVenEnerRD ( unidad, modo, 2, intervalo ) .gt. 0.0 ) then
+                        numseg = numseg + 1
+                    endif
+                end if            
+            end do
+            NumBloVRD   ( unidad, modo, intervalo ) = numseg
+        end do
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+! -----------------------------
+! * Se leen datos de LIUNITRD *
+! * Se leen datos de LSUNITRD *
+! -----------------------------
+!Potencia mínima de unidades térmicas, PotMinGRD
+! -----------------------------------------
+!Potencia máxima de unidades térmicas, PotMaxGRD
+write ( 1, 100 ) '--------------------------------------------------------'
+write ( 1, 100 ) 'POTENCIAS MINIMA Y MAXIMA DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '--------------------------------------------------------'
+
+OPEN (UNIT = 78, FILE = rut_dat_1( 1 : long_ruta )//'LIUNITRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+OPEN (UNIT = 79, FILE = rut_dat_1( 1 : long_ruta )//'LSUNITRD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )     
+        read ( 78, 100, iostat = ierror ) letaux
+        read ( 79, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( PotMinGRD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                read ( letaux_1, * )  ( PotMaxGRD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Min:', ( PotMinGRD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Max:', ( PotMaxGRD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )             
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Min:', ( PotMinGRD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Max:', ( PotMaxGRD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 78, 100, iostat = ierror ) letaux
+                    read ( 79, 100, iostat = ierror_1 ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( PotMinGRD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                        read ( letaux_1, * )  ( PotMaxGRD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Min:',( PotMinGRD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) 'Max:',( PotMaxGRD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Min:',( PotMinGRD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) 'Max:',( PotMaxGRD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 78, 100, iostat = ierror ) letaux
+                read ( 79, 100, iostat = ierror ) letaux_1
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO LIUNITRD.csv/LSUNITRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 78 )
+CLOSE ( UNIT = 79 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+PotMinGRD = PotMinGRD / Base
+PotMaxGRD = PotMaxGRD / Base
+
+
+! si se desea considerar limites de regulacion
+if ( SiLimReg .eq. 1 ) then
+
+    ierror = 0
+    ierror_1 = 0
+    i = 0
+
+    consecutivo = 1
+
+    ! -----------------------------
+    ! * Se leen datos de LIRUNITRD *
+    ! * Se leen datos de LSRUNITRD *
+    ! -----------------------------
+    !Potencia mínima de unidades térmicas, PotMinRRD
+    ! -----------------------------------------
+    !Potencia máxima de unidades térmicas, PotMaxRRD
+    write ( 1, 100 ) '----------------------------------------------------------------------'
+    write ( 1, 100 ) 'POTENCIAS MINIMA Y MAXIMA DE REGULACION DE UNIDADES RANGO DISCONTINUO'
+    write ( 1, 100 ) '----------------------------------------------------------------------'
+
+    OPEN (UNIT = 78, FILE = rut_dat_1( 1 : long_ruta )//'LIRUNITRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+    OPEN (UNIT = 79, FILE = rut_dat_1( 1 : long_ruta )//'LSRUNITRD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 3000)
+     
+    if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+        ! Lee información hasta encontrar fin de información
+        do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )     
+            read ( 78, 100, iostat = ierror ) letaux
+            read ( 79, 100, iostat = ierror_1 ) letaux_1
+            i = i + 1
+            if ( corresprd ( consecutivo ) .eq. i ) then
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                    read ( letaux, * )  ( PotMinRRD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                    read ( letaux_1, * )  ( PotMaxRRD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                    bloque = ntintr / 24
+                    do k = 1, bloque
+                        write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                        write ( 1, 100 ) 'Modo 1'
+                        write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Min:', ( PotMinRRD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )
+                        write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Max:', ( PotMaxRRD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )             
+                    end do
+                    if ( ntintr - 24 * bloque .gt. 0 ) then
+                        write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                        write ( 1, 100 ) 'Modo 1'
+                        write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Min:', ( PotMinRRD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                        write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Max:', ( PotMaxRRD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                    end if
+                    do contador = 2, maxmodos
+                        read ( 78, 100, iostat = ierror ) letaux
+                        read ( 79, 100, iostat = ierror_1 ) letaux_1
+                        if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                            read ( letaux, * )  ( PotMinRRD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                            read ( letaux_1, * )  ( PotMaxRRD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                            if ( contador .le. NumModRD ( consecutivo ) ) then
+                                bloque = ntintr / 24
+                                do k = 1, bloque
+                                    write ( 1, 800 ) 'Modo', contador
+                                    write ( 1, 1200 ) 'Min:',( PotMinRRD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                                    write ( 1, 1200 ) 'Max:',( PotMaxRRD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                                end do
+                                if ( ntintr - 24 * bloque .gt. 0 ) then
+                                    write ( 1, 800 ) 'Modo', contador
+                                    write ( 1, 1200 ) 'Min:',( PotMinRRD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                                    write ( 1, 1200 ) 'Max:',( PotMaxRRD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                                end if
+                            end if
+                        end if
+                    end do
+                    consecutivo = consecutivo + 1
+                end if
+            else
+                do contador = 2, maxmodos
+                    read ( 78, 100, iostat = ierror ) letaux
+                    read ( 79, 100, iostat = ierror ) letaux_1
+                end do
+	        endif
+        enddo
+    else	
+	    ibanbit = 1
+        ierror = 0
+        Call FechaEjecucion (fecha_Ej)
+        bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO LIRUNITRD.csv/LSRUNITRD.csv'
+        Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+        write(*,*) '1'
+    !   Se ecribe resultado de semaforos
+        call EscSemaforosError
+!       algoritmo no termina bien
+        call SalidaError
+        stop
+    end if
+
+    CLOSE ( UNIT = 78 )
+    CLOSE ( UNIT = 79 )
+
+    write ( 1, 100 ) ''
+
+    !Escalamiento
+    PotMinRRD = PotMinRRD / Base
+    PotMaxRRD = PotMaxRRD / Base
+else
+    PotMinRRD = PotMinGRD
+    PotMaxRRD = PotMaxGRD
+endif
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+!Se leen datos de condiciones iniciales
+write ( 1, 100 ) '----------------------------------------------------'
+write ( 1, 100 ) 'CONDICIONES INICIALES UNIDADES DE RANGO DISCONTINUO'
+write ( 1, 100 ) '----------------------------------------------------'
+
+! ------------------------------
+! * Se leen datos de UNITRDCI *
+! ------------------------------
+
+write ( 1, 100 ) 'Unidad  Nombre        Estado    Horas   Generacion'
+
+OPEN (UNIT = 80, FILE = rut_dat_1( 1 : long_ruta )//'UNITRDCI.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 80, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  EstadoCIURD ( consecutivo, 1 ), NumHCIURD ( consecutivo, 1 ), GenCIURD ( consecutivo, 1 )
+                !Calcula el numero de periodos en condiciones iniciales dependiendo de la duracion del intervalo
+                NumHCIURD ( consecutivo, 1 ) = NumHCIURD ( consecutivo, 1 ) * 60
+                NumHCIURD ( consecutivo, 1 ) = NumHCIURD ( consecutivo, 1 ) / durintr
+                write ( 1, 100 ) 'Modo 1'
+                write ( 1, 1300 ) consecutivo, nombunird ( consecutivo ), EstadoCIURD ( consecutivo, 1 ), NumHCIURD ( consecutivo, 1 ), GenCIURD ( consecutivo, 1 )
+            end if
+            do contador = 2, maxmodos
+                read ( 80, 100, iostat = ierror ) letaux
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                    read ( letaux, * )  EstadoCIURD ( consecutivo, contador ), NumHCIURD ( consecutivo, contador ), GenCIURD ( consecutivo, contador )
+                    if ( contador .le. NumModRD ( consecutivo ) ) then
+                        !Calcula el numero de periodos en condiciones iniciales dependiendo de la duracion del intervalo
+                        NumHCIURD ( consecutivo, contador ) = NumHCIURD ( consecutivo, contador ) * 60
+                        NumHCIURD ( consecutivo, contador ) = NumHCIURD ( consecutivo, contador ) / durintr
+                        write ( 1, 800 ) 'Modo', contador
+                        write ( 1, 1400 ) EstadoCIURD ( consecutivo, contador ), NumHCIURD ( consecutivo, contador ), GenCIURD ( consecutivo, contador )
+                    end if
+                end if
+            end do
+            consecutivo = consecutivo + 1
+        else
+            do contador = 2, maxmodos
+                read ( 80, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO UNITRDCI.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 80 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+GenCIURD = GenCIURD / Base
+
+ierror = 0
+i = 0
+! ----------------------------
+! * Se leen datos de TMINMODRD *
+! ----------------------------
+
+consecutivo = 1
+OPEN (UNIT = 80, FILE = rut_dat_1( 1 : long_ruta )//'TMINMODRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 80, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( TminModoURD ( consecutivo, columna ), columna = 1, maxmodos )
+                consecutivo = consecutivo + 1
+            end if
+        end if
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO TMINMODRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 80 )
+
+ierror = 0
+i = 0
+
+!Imprime a debugger tiempos minimos de operacion de los modos
+
+write ( 1, 100 ) '---------------------------------------------------------------------'
+write ( 1, 100 ) 'TIEMPO MINIMO DE OPERACION DE LOS MODOS DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '---------------------------------------------------------------------'
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre'
+    write ( 1, 200 ) unidad, nombunird ( unidad )
+    !Hacer para todas las columnas
+    do columna = 1, NumModRD ( unidad )
+        !Calcula el tiempo minimo de operacion del modo dependiendo de la duracion del intervalo
+        TminModoURD ( unidad, columna ) = TminModoURD ( unidad, columna ) * 60
+        TminModoURD ( unidad, columna ) = TminModoURD ( unidad, columna ) / durintr
+        write ( 1, 1700 ) 'modo',columna,':',TminModoURD ( unidad, columna )
+    end do
+end do
+
+write ( 1, 100 ) ''
+!
+! ---------------------------------
+! * Se leen datos de MAXTRANSRD      *
+! ---------------------------------
+consecutivo = 1
+OPEN (UNIT = 83, FILE = rut_dat_1( 1 : long_ruta )//'MAXTRANSRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 83, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( NumMaxTrans ( consecutivo, 1, columna ), columna = 1, maxmodos )
+                do contador = 2, maxmodos
+                    read ( 83, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( NumMaxTrans ( consecutivo, contador, columna ), columna = 1, maxmodos )
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 83, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO MAXTRANSRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 83 )
+
+ierror = 0
+i = 0
+
+!Imprime a debugger maximo de transiciones entre modos
+
+write ( 1, 100 ) '----------------------------------------------------------------------------------' 
+write ( 1, 100 ) 'NUMERO MAXIMO DE TRANSICIONES FACTIBLES ENTRE MODOS UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '----------------------------------------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre'
+    write ( 1, 200 ) unidad, nombunird ( unidad )
+    !Hacer para todas las filas
+    do fila = 1, NumModRD ( unidad )
+        write ( 1, 500 ) ( NumMaxTrans ( unidad, fila, columna ), columna = 1, NumModRD ( unidad ) )
+    end do
+end do
+
+write ( 1, 100 ) ''
+!
+! ---------------------------------
+! * Se leen datos de TIETRANSRD      *
+! ---------------------------------
+consecutivo = 1
+OPEN (UNIT = 84, FILE = rut_dat_1( 1 : long_ruta )//'TIETRANSRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 84, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( TiempoTrans ( consecutivo, 1, columna ), columna = 1, maxmodos )
+                do contador = 2, maxmodos
+                    read ( 84, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( TiempoTrans ( consecutivo, contador, columna ), columna = 1, maxmodos )
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 84, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO TIETRANSRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 84 )
+
+ierror = 0
+i = 0
+
+!Imprime a debugger maximo de transiciones entre modos
+
+write ( 1, 100 ) '---------------------------------------------------------------' 
+write ( 1, 100 ) 'TIEMPO DE TRANSICION ENTRE MODOS UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '---------------------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre'
+    write ( 1, 200 ) unidad, nombunird ( unidad )
+    !Hacer para todas las filas
+    do fila = 1, NumModRD ( unidad )
+        !Hacer para todos los modos
+        do columna = 1, NumModRD ( unidad )
+            !Calcular los intervalos de transision dependiendo de la duracion del intervalo
+            TiempoTrans ( unidad, fila, columna ) = TiempoTrans ( unidad, fila, columna ) * 60
+            TiempoTrans ( unidad, fila, columna ) = TiempoTrans ( unidad, fila, columna ) / durintr
+        end do
+        write ( 1, 500 ) ( TiempoTrans ( unidad, fila, columna ), columna = 1, NumModRD ( unidad ) )
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+!
+! ---------------------------------
+! * Se leen datos de COSTRANSRD      *
+! ---------------------------------
+consecutivo = 1
+OPEN (UNIT = 85, FILE = rut_dat_1( 1 : long_ruta )//'COSTRANSRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )  
+        read ( 85, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( CostoTrans ( consecutivo, 1, columna ), columna = 1, maxmodos )
+                do contador = 2, maxmodos
+                    read ( 85, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( CostoTrans ( consecutivo, contador, columna ), columna = 1, maxmodos )
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 85, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO COSTRANSRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+
+CLOSE ( UNIT = 85 )
+
+ierror = 0
+i = 0
+
+!Imprime a debugger costo de transiciones entre modos
+
+write ( 1, 100 ) '--------------------------------------------------------------' 
+write ( 1, 100 ) 'COSTO DE TRANSICION ENTRE MODOS UNIDADES DE RANGO DISCONTINUO' 
+write ( 1, 100 ) '--------------------------------------------------------------' 
+!Hacer para todas las unidades de rango discontinuo
+do unidad = 1, NumUniRD
+    write ( 1, 100 ) 'Unidad  Nombre'
+    write ( 1, 200 ) unidad, nombunird ( unidad )
+    !Hacer para todas las filas
+    do fila = 1, NumModRD ( unidad )
+        !Hacer para todas las columnas
+        do columna = 1, NumModRD ( unidad )
+            if ( CostoTrans ( unidad, fila, columna ) .eq. 0.0 .and. fila .ne. columna .and. fila .gt. 1 &
+                 .and. TransFacti ( unidad, fila, columna ) .eq. 1 ) then
+                !Pone costo de transicion en uno para evitar inicio de asignacion de modo tenga valor si no es necesario
+                CostoTrans ( unidad, fila, columna ) = 1.0
+            end if
+        end do
+        write ( 1, 1800 ) ( CostoTrans ( unidad, fila, columna ), columna = 1, NumModRD ( unidad ) )
+    end do
+end do
+
+write ( 1, 100 ) ''
+
+write ( 1, 100 ) '----------------------------------------------------'
+write ( 1, 100 ) 'ASIGNABILIDAD DE MODOS DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '----------------------------------------------------'
+! ----------------------------
+! * Se leen datos de ASIGNRD *
+! ----------------------------
+ierror = 0
+i = 0
+
+consecutivo = 1
+
+OPEN (UNIT = 86, FILE = rut_dat_1( 1 : long_ruta )//'ASIGNRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )     
+        read ( 86, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( AsignURD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1900 ) consecutivo, nombunird ( consecutivo ), ( AsignURD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1900 ) consecutivo, nombunird ( consecutivo ), ( AsignURD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 86, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( AsignURD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 2000 ) ( AsignURD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 2000 ) ( AsignURD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 86, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO ASIGNRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 86 )
+!goto 2222
+write ( 1, 100 ) ''
+
+write ( 1, 100 ) '----------------------------------------------------'
+write ( 1, 100 ) 'DISPONIBILIDAD DE MODOS DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '----------------------------------------------------'
+! ----------------------------
+! * Se leen datos de DISPORD *
+! ----------------------------
+ierror = 0
+i = 0
+
+consecutivo = 1
+
+OPEN (UNIT = 86, FILE = rut_dat_1( 1 : long_ruta )//'DISPORD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+    ! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )     
+        read ( 86, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  ( DispoURD ( consecutivo, 1, columna ), columna = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1900 ) consecutivo, nombunird ( consecutivo ), ( DispoURD ( consecutivo, 1, columna ), columna = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1900 ) consecutivo, nombunird ( consecutivo ), ( DispoURD ( consecutivo, 1, columna ), columna = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 86, 100, iostat = ierror ) letaux
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                        read ( letaux, * )  ( DispoURD ( consecutivo, contador, columna ), columna = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 2000 ) ( DispoURD ( consecutivo, contador, columna ), columna = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 2000 ) ( DispoURD ( consecutivo, contador, columna ), columna = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 86, 100, iostat = ierror ) letaux
+            end do
+	    endif
+    enddo
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO DISPORD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError    
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 86 )
+2222 continue
+
+write ( 1, 100 ) ''
+
+!Se calcula disponibilidad y coordinabilidad de los modos de unidades de Rango Discontinuo en base a su oferta
+call Dispo_Coord_RD
+
+ierror = 0
+i = 0
+
+consecutivo = 1
+write ( 1, 100 ) '-------------------------------------------------------------'
+write ( 1, 100 ) 'INFORMACION DE PROCESO DE ARRANQUE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '-------------------------------------------------------------'
+! ----------------------------
+! * Se leen datos de ARRARD *
+! ----------------------------
+
+write ( 1, 100 ) 'Unidad  Nombre               Pot. Sinc.        Pot. Sinc. NR 10    Pot. Sinc. NR Su  Rampa Arr. MW/interv.'
+
+OPEN (UNIT = 81, FILE = rut_dat_1( 1 : long_ruta )//'ARRARD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )        
+	    read ( 81, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  PotSincURD ( consecutivo, 1 ), PotSincNR10URD ( consecutivo, 1 ), PotSincNRSURD ( consecutivo, 1 ), RampArraURD ( consecutivo, 1 )
+                RampArraURD ( consecutivo, 1 ) = RampArraURD ( consecutivo, 1 ) * durintr
+                write ( 1, 100 ) 'Modo 1'
+                write ( 1, 1500 ) consecutivo, nombunird ( consecutivo ), PotSincURD ( consecutivo, 1 ), PotSincNR10URD ( consecutivo, 1 ), PotSincNRSURD ( consecutivo, 1 ), RampArraURD ( consecutivo, 1 )
+            end if
+            do contador = 2, maxmodos
+                read ( 81, 100, iostat = ierror ) letaux
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                    read ( letaux, * )  PotSincURD ( consecutivo, contador ), PotSincNR10URD ( consecutivo, contador ), PotSincNRSURD ( consecutivo, contador ), RampArraURD ( consecutivo, contador )
+                    RampArraURD ( consecutivo, contador ) = RampArraURD ( consecutivo, contador ) * durintr
+                    if ( contador .le. NumModRD ( consecutivo ) ) then
+                        write ( 1, 800 ) 'Modo', contador
+                        write ( 1, 1600 ) PotSincURD ( consecutivo, contador ), PotSincNR10URD ( consecutivo, contador ), PotSincNRSURD ( consecutivo, contador ), RampArraURD ( consecutivo, contador )
+                    end if
+                end if
+            end do
+            consecutivo = consecutivo + 1
+        else
+            do contador = 2, maxmodos
+                read ( 81, 100, iostat = ierror ) letaux
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO ARRARD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 81 )
+
+!Escalamiento
+PotSincURD = PotSincURD / Base
+PotSincNR10URD =  PotSincNR10URD / Base
+PotSincNRSURD = PotSincNRSURD / Base
+RampArraURD = RampArraURD / Base
+
+
+write ( 1, 100 ) ''
+
+ierror = 0
+i = 0
+
+! ------------------------------
+! * Se leen datos de COVAARRD *
+! ------------------------------
+write ( 1, 100 ) '-------------------------------------------------------'
+write ( 1, 100 ) 'COSTOS VARIABLES DE ARRANQUE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '-------------------------------------------------------'
+
+OPEN (UNIT = 87, FILE = rut_dat_1( 1 : long_ruta )//'COVAARRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0  ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0  )        
+	    read ( 87, 100, iostat = ierror ) letaux
+        i = i + 1
+        entro = .false.
+        !Hacer para todoas las unidades de rango discontinuo
+        do unidad = 1, NumUniRD
+            segmento = 1
+            if ( corresprd ( unidad ) .eq. i ) then
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                    entro = .true.
+                    read ( letaux, * )  ( TiemInicioArrRDS ( unidad, modo, segmento ), modo = 1, maxmodos ),  ( CostoArrRDS ( unidad, modo, segmento ), modo = 1, maxmodos )
+                    !Hacer para los segmentos del segundo en adelante
+                    do segmento = 2, maxsegarrd
+                        read ( 87, 100, iostat = ierror ) letaux
+                        read ( letaux, * )  ( TiemInicioArrRDS ( unidad, modo, segmento ), modo = 1, maxmodos ),  ( CostoArrRDS ( unidad, modo, segmento ), modo = 1, maxmodos )
+                    end do                    
+                end if
+            end if
+            if ( unidad .eq. NumUniRD .and. entro .eq. .false. ) then
+                do segmento = 2, maxsegarrd
+                    read ( 87, 100, iostat = ierror ) letaux                    
+                end do                    
+            end if
+        end do
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO COVAARRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 87 )
+
+!Calcular cuantos segmentos de costos de arranque variable por unidad 
+do unidad = 1, NumUniRD
+    !Hacer para todos los modos de la unidad
+    do modo = 1, NumModRD(unidad)
+        numseg = 0
+        !Hacer para todos los segmentos
+        do segmento = 1, maxsegarrd
+        !Encontrar segmento con tiempo cero
+            if ( TiemInicioArrRDS ( unidad, modo, segmento ) .ne. 0 ) then
+                numseg = numseg + 1
+            end if            
+        end do
+        NmBloArrURD ( unidad, modo ) = numseg
+    end do
+end do
+!Escribir a bitacora
+!Hacer para todas las unidades
+do unidad = 1, NumUniRD
+    modo_prev = 0
+    do modo = 1, NumModRD(unidad)
+        !Hacer para todos los segmentos del modo
+        do segmento = 1, NmBloArrURD ( unidad, modo )
+            if ( modo_prev .ne. modo ) then
+                write ( 1, 800 ) 'Modo', modo
+                modo_prev = modo
+            end if
+            !Modificar intervalos en paro dependiendo de la duracion del intervalo
+            TiemInicioArrRDS ( unidad, modo, segmento ) = TiemInicioArrRDS ( unidad, modo, segmento ) * 60
+            TiemInicioArrRDS ( unidad, modo, segmento ) = TiemInicioArrRDS ( unidad, modo, segmento ) /durintr
+            write ( 1, 2200 ) unidad, nombunird ( unidad ), 'Hr', TiemInicioArrRDS ( unidad, modo, segmento )
+            write ( 1, 2100 ) unidad, nombunird ( unidad ), '$', CostoArrRDS ( unidad, modo, segmento )
+        end do        
+    end do
+end do
+
+ierror = 0
+i = 0
+
+write ( 1, 100 ) ''
+
+consecutivo = 1
+write ( 1, 100 ) '---------------------------------'
+write ( 1, 100 ) 'RAMPAS UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '---------------------------------'
+! ----------------------------
+! * Se leen datos de RAMPASRD *
+! ----------------------------
+
+write ( 1,  90 ) 'Unidad  Nombre             Op. Subida Op. Bajada   Emer. 10   Emer. ', minresup, '    Reg. ', minresre, 'Reg Termico'
+
+OPEN (UNIT = 88, FILE = rut_dat_1( 1 : long_ruta )//'RAMPASRD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 3000)
+     
+if ( ierror .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 )        
+	    read ( 88, 100, iostat = ierror ) letaux
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                read ( letaux, * )  rampaup, rampadown, emergencia, regulacion, regimen
+                RampaSubURD ( consecutivo, 1 ) = rampaup * durintr
+                RampaBajURD ( consecutivo, 1 ) = rampadown * durintr
+                !Se verifica la rampa de emergencia de 10 minutos vs duracion del intervalo para reserva rodante de 10 min
+                if ( durintr .lt. 10 ) then
+                    RamEmer10RD ( consecutivo, 1 ) = emergencia * durintr
+                else
+                    RamEmer10RD ( consecutivo, 1 ) = emergencia * 10
+                end if
+                !Se verifica la rampa de emergencia de x minutos vs duracion del intervalo para reserva rodante suplementaria
+                if ( durintr .lt. minresup  ) then
+                    RamEmerxRD ( consecutivo, 1 ) = emergencia * durintr
+                else
+                    RamEmerxRD ( consecutivo, 1 ) = emergencia * minresup 
+                end if
+                !Se verifica la rampa de emergencia de x minutos vs duracion del intervalo para reserva rodante suplementaria
+                if ( durintr .lt. minresre   ) then
+                    RamRegRD ( consecutivo, 1 ) = regulacion * durintr
+                else
+                    RamRegRD ( consecutivo, 1 ) = regulacion * minresre 
+                end if                    
+                RTerURD ( consecutivo, 1 ) = regimen 
+                write ( 1, 100 ) 'Modo 1'
+                write ( 1, 2300 ) consecutivo, nombunird ( consecutivo ), RampaSubURD ( consecutivo, 1 ), RampaBajURD ( consecutivo, 1 ), &
+                                  RamEmer10RD ( consecutivo, 1 ), RamEmerxRD ( consecutivo, 1 ), RamRegRD ( consecutivo, 1 ), RTerURD ( consecutivo, 1 )
+            end if
+            do contador = 2, maxmodos
+                read ( 88, 100, iostat = ierror ) letaux
+                if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 ) then
+                    read ( letaux, * )  rampaup, rampadown, emergencia, regulacion, regimen
+                    RampaSubURD ( consecutivo, contador ) = rampaup * durintr
+                    RampaBajURD ( consecutivo, contador ) = rampadown * durintr
+                    !Se verifica la rampa de emergencia de 10 minutos vs duracion del intervalo para reserva rodante de 10 min
+                    if ( durintr .lt. 10 ) then
+                        RamEmer10RD ( consecutivo, contador ) = emergencia * durintr
+                    else
+                        RamEmer10RD ( consecutivo, contador ) = emergencia * 10
+                    end if
+                    !Se verifica la rampa de emergencia de x minutos vs duracion del intervalo para reserva rodante suplementaria
+                    if ( durintr .lt. minresup  ) then
+                        RamEmerxRD ( consecutivo, contador ) = emergencia * durintr
+                    else
+                        RamEmerxRD ( consecutivo, contador ) = emergencia * minresup 
+                    end if
+                    !Se verifica la rampa de emergencia de x minutos vs duracion del intervalo para reserva rodante suplementaria
+                    if ( durintr .lt. minresre   ) then
+                        RamRegRD ( consecutivo, contador ) = regulacion * durintr
+                    else
+                        RamRegRD ( consecutivo, contador ) = regulacion * minresre 
+                    end if
+                    RTerURD ( consecutivo, contador ) = regimen 
+                    if ( contador .le. NumModRD ( consecutivo ) ) then
+                        write ( 1, 800 ) 'Modo', contador
+                        write ( 1, 2400 ) RampaSubURD ( consecutivo, contador ), RampaBajURD ( consecutivo, contador ), RamEmer10RD ( consecutivo, contador ), &
+                                          RamEmerxRD ( consecutivo, contador ), RamRegRD ( consecutivo, contador ), RTerURD ( consecutivo, contador )
+                    end if
+                end if
+            end do
+            consecutivo = consecutivo + 1
+        else
+            do contador = 2, maxmodos
+                read ( 88, 100, iostat = ierror ) letaux
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO RAMPASRD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+
+CLOSE ( UNIT = 88 )
+
+!Escalamiento
+RampaSubURD = RampaSubURD / Base
+RampaBajURD = RampaBajURD / Base
+RamEmer10RD = RamEmer10RD / Base
+RamEmerxRD = RamEmerxRD / Base
+RamRegRD = RamRegRD / Base
+!RTerURD = RTerURD / Base
+
+
+write ( 1, 100 ) ''
+
+ierror = 0
+i = 0
+
+consecutivo = 1
+! ---------------------------------
+! * Se leen datos de POTRESRO10RD *
+! * Se leen datos de PRERESRO10RD *
+! ---------------------------------
+!Potencia oferta de reserva rodante de 10 min
+! -----------------------------------------
+!Precio oferta de reserva rodante de 10 min
+write ( 1, 100 ) '-----------------------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE RESERVA RODANTE DE 10 MIN DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '-----------------------------------------------------------------'
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 89, FILE = rut_dat_1( 1 : long_ruta )//'POTRESRO10RD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 250)
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 90, FILE = rut_dat_1( 1 : long_ruta )//'PRERESRO10RD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )       
+        read ( 89, 100, iostat = ierror ) letaux
+        read ( 90, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( OferResR10RD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                read ( letaux_1, * )  ( PreVenResR10RD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 89, 100, iostat = ierror ) letaux
+                    read ( 90, 100, iostat = ierror_1 ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( OferResR10RD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenResR10RD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 89, 100, iostat = ierror ) letaux
+                read ( 90, 100, iostat = ierror_1 ) letaux_1
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTRESRO10RD.csv / PRERESRO10RD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+        
+CLOSE ( UNIT = 89 )
+CLOSE ( UNIT = 90 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+OferResR10RD = OferResR10RD / Base
+PreVenResR10RD = PreVenResR10RD * Base
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+! ---------------------------------
+! * Se leen datos de POTRESROSURD *
+! * Se leen datos de PRERESROSURD *
+! ---------------------------------
+!Potencia oferta de reserva rodante suplementaria
+! -----------------------------------------
+!Precio oferta de reserva rodante suplementaria
+write ( 1, 100 ) '--------------------------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE RESERVA RODANTE SUPLEMENTARIA DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '---------------------------------------------------------------------'
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 91, FILE = rut_dat_1( 1 : long_ruta )//'POTRESROSURD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 250)
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 92, FILE = rut_dat_1( 1 : long_ruta )//'PRERESROSURD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )       
+        read ( 91, 100, iostat = ierror ) letaux
+        read ( 92, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( OferResRxRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                read ( letaux_1, * )  ( PreVenResRxRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 91, 100, iostat = ierror ) letaux
+                    read ( 92, 100, iostat = ierror_1 ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( OferResRxRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenResRxRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 91, 100, iostat = ierror ) letaux
+                read ( 92, 100, iostat = ierror_1 ) letaux_1
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTRESROSURD.csv / PRERESROSURD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+        
+CLOSE ( UNIT = 91 )
+CLOSE ( UNIT = 92 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+OferResRxRD = OferResRxRD / Base
+PreVenResRxRD = PreVenResRxRD * Base
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+! ---------------------------------
+! * Se leen datos de POTRESRESERD *
+! * Se leen datos de PRERESRESERD *
+! * Se leen datos de MINRESRESERD *
+! ---------------------------------
+!Potencia oferta de reserva de regulacion secundaria
+! -----------------------------------------
+!Precio oferta de reserva de regulacion secundaria
+write ( 1, 100 ) '------------------------------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE RESERVA DE REGULACION SECUNDARIA DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '------------------------------------------------------------------------'
+! Abre archivo de datos de generadores
+OPEN (UNIT = 93, FILE = rut_dat_1( 1 : long_ruta )//'POTRESRESERD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 250)
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 94, FILE = rut_dat_1( 1 : long_ruta )//'PRERESRESERD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+
+if ( SiResRegDis .eq. 1 ) then
+!   Abre archivo de datos de reserva distribuida
+    OPEN (UNIT = 95, FILE = rut_dat_1( 1 : long_ruta )//'MINRESRESERD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+endif
+
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    letaux_2 = 'letaux_2'
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 .and. len_trim ( letaux_2 ) .ne. 0 )       
+        read ( 93, 100, iostat = ierror ) letaux
+        read ( 94, 100, iostat = ierror_1 ) letaux_1
+        if ( SiResRegDis .eq. 1 ) then
+            read ( 95, 100, iostat = ierror_2 ) letaux_2
+        endif
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 .and. ierror_2 .eq. 0 .and. len_trim(letaux_2) .ne. 0 ) then
+                read ( letaux, * )  ( OferResRegRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                read ( letaux_1, * )  ( PreVenResRegRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                if ( SiResRegDis .eq. 1 ) then
+                    read ( letaux_2, * )  ( MrreURD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                endif
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResRegRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResRegRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    if ( SiResRegDis .eq. 1 ) then
+                        write ( 1, 1100 ) unidad, nombunird ( consecutivo ), 'PMi:', ( MrreURD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    endif
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResRegRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResRegRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    if ( SiResRegDis .eq. 1 ) then
+                        write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pmi:', ( MrreURD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    endif
+                end if
+                do contador = 2, maxmodos
+                    read ( 93, 100, iostat = ierror ) letaux
+                    read ( 94, 100, iostat = ierror_1 ) letaux_1
+                    if ( SiResRegDis .eq. 1 ) then
+                        read ( 95, 100, iostat = ierror_2 ) letaux_2
+                    endif
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 .and. ierror_2 .eq. 0 .and. len_trim(letaux_2) .ne. 0 ) then
+                        read ( letaux, * )  ( OferResRegRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenResRegRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        if ( SiResRegDis .eq. 1 ) then
+                            read ( letaux_2, * )  ( MrreURD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        endif
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResRegRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResRegRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                if ( SiResRegDis .eq. 1 ) then
+                                    write ( 1, 1200 ) 'PMi:', ( MrreURD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                endif
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResRegRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResRegRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                if ( SiResRegDis .eq. 1 ) then
+                                    write ( 1, 1200 ) 'Pmi:', ( MrreURD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                endif
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 93, 100, iostat = ierror ) letaux
+                read ( 94, 100, iostat = ierror_1 ) letaux_1
+                if ( SiResRegDis .eq. 1 ) then
+                    read ( 95, 100, iostat = ierror_2 ) letaux_2
+                endif
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTRESRESERD.csv / PRERESRESERD.csv / MINRESRESERD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+        
+CLOSE ( UNIT = 93 )
+CLOSE ( UNIT = 94 )
+if ( SiResRegDis .eq. 1 ) then
+    CLOSE ( UNIT = 95 )
+endif
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+OferResRegRD = OferResRegRD / Base
+PreVenResRegRD = PreVenResRegRD * Base
+MrreURD = MrreURD / Base
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+! ---------------------------------
+! * Se leen datos de POTRESNR10RD *
+! * Se leen datos de PRERESNR10RD *
+! ---------------------------------
+!Potencia oferta de reserva no rodante de 10 min
+! -----------------------------------------
+!Precio oferta de reserva no rodante de 10 min
+write ( 1, 100 ) '--------------------------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE RESERVA NO RODANTE DE 10 MIN DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '--------------------------------------------------------------------'
+! Abre archivo de datos de generadores
+OPEN (UNIT = 95, FILE = rut_dat_1( 1 : long_ruta )//'POTRESNR10RD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 250)
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 96, FILE = rut_dat_1( 1 : long_ruta )//'PRERESNR10RD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )       
+        read ( 95, 100, iostat = ierror ) letaux
+        read ( 96, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( OferResNR10RD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                read ( letaux_1, * )  ( PreVenResNR10RD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResNR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResNR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResNR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResNR10RD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 95, 100, iostat = ierror ) letaux
+                    read ( 96, 100, iostat = ierror_1 ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( OferResNR10RD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenResNR10RD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResNR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResNR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResNR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResNR10RD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 95, 100, iostat = ierror ) letaux
+                read ( 96, 100, iostat = ierror_1 ) letaux_1
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTRESNR10RD.csv / PRERESNR10RD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+        
+CLOSE ( UNIT = 95 )
+CLOSE ( UNIT = 96 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+OferResNR10RD = OferResNR10RD / Base
+PreVenResNR10RD = PreVenResNR10RD * Base
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+consecutivo = 1
+! ---------------------------------
+! * Se leen datos de POTRESNRSURD *
+! * Se leen datos de PRERESNRSURD *
+! ---------------------------------
+!Potencia oferta de reserva no rodante suplementaria
+! -----------------------------------------
+!Precio oferta de reserva no rodante suplementaria
+write ( 1, 100 ) '------------------------------------------------------------------------'
+write ( 1, 100 ) 'OFERTA DE RESERVA NO RODANTE SUPLEMENTARIA DE UNIDADES RANGO DISCONTINUO'
+write ( 1, 100 ) '------------------------------------------------------------------------'
+! Abre archivo de datos de generadores
+OPEN (UNIT = 97, FILE = rut_dat_1( 1 : long_ruta )//'POTRESNRSURD.csv', IOSTAT = IERROR_1, STATUS='OLD', RECORDSIZE = 250)
+
+! Abre archivo de datos de generadores
+OPEN (UNIT = 98, FILE = rut_dat_1( 1 : long_ruta )//'PRERESNRSURD.csv', IOSTAT = IERROR, STATUS='OLD', RECORDSIZE = 250)
+
+if ( ierror .eq. 0 .and. ierror_1 .eq. 0 ) then
+! Lee información hasta encontrar fin de información
+    do while ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim ( letaux_1 ) .ne. 0 )       
+        read ( 97, 100, iostat = ierror ) letaux
+        read ( 98, 100, iostat = ierror_1 ) letaux_1
+        i = i + 1
+        if ( corresprd ( consecutivo ) .eq. i ) then
+            if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                read ( letaux, * )  ( OferResNRxRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                read ( letaux_1, * )  ( PreVenResNRxRD ( consecutivo, 1, intervalo ), intervalo = 1, ntintr )
+                bloque = ntintr / 24
+                do k = 1, bloque
+                    write ( 1, 600 ) 'intervalo:', 24 * k - 23, 'a', 24 * k
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResNRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResNRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                end do
+                if ( ntintr - 24 * bloque .gt. 0 ) then
+                    write ( 1, 600 ) 'intervalo:', 24 * bloque + 1 , 'a', ntintr
+                    write ( 1, 100 ) 'Modo 1'
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), 'Pot:', ( OferResNRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                    write ( 1, 1100 ) consecutivo, nombunird ( consecutivo ), '$  :', ( PreVenResNRxRD ( consecutivo, 1, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                end if
+                do contador = 2, maxmodos
+                    read ( 97, 100, iostat = ierror ) letaux
+                    read ( 98, 100, iostat = ierror_1 ) letaux_1
+                    if ( ierror .eq. 0 .and. len_trim(letaux) .ne. 0 .and. ierror_1 .eq. 0 .and. len_trim(letaux_1) .ne. 0 ) then
+                        read ( letaux, * )  ( OferResNRxRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        read ( letaux_1, * )  ( PreVenResNRxRD ( consecutivo, contador, intervalo ), intervalo = 1, ntintr )
+                        if ( contador .le. NumModRD ( consecutivo ) ) then
+                            bloque = ntintr / 24
+                            do k = 1, bloque
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResNRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResNRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * k - 23 , 24 * k  )
+                            end do
+                            if ( ntintr - 24 * bloque .gt. 0 ) then
+                                write ( 1, 800 ) 'Modo', contador
+                                write ( 1, 1200 ) 'Pot:', ( OferResNRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                                write ( 1, 1200 ) '$  :', ( PreVenResNRxRD ( consecutivo, contador, intervalo ), intervalo = 24 * bloque + 1 , ntintr  )
+                            end if
+                        end if
+                    end if
+                end do
+                consecutivo = consecutivo + 1
+            end if
+        else
+            do contador = 2, maxmodos
+                read ( 97, 100, iostat = ierror ) letaux
+                read ( 98, 100, iostat = ierror_1 ) letaux_1
+            end do
+        end if
+    end do
+else	
+	ibanbit = 1
+    ierror = 0
+    Call FechaEjecucion (fecha_Ej)
+    bmensaje = fecha_Ej//' '//NomEjecu//'LEC ERROR DE LECTURA ARCHIVO POTRESNRSURD.csv / PRERESNRSURD.csv'
+    Call Mensaje_AuSeg ( ierror, ibanbit, BMensaje )
+    write(*,*) '1'
+!   Se ecribe resultado de semaforos
+    call EscSemaforosError
+!   algoritmo no termina bien
+    call SalidaError
+    stop
+end if
+        
+CLOSE ( UNIT = 97 )
+CLOSE ( UNIT = 98 )
+
+write ( 1, 100 ) ''
+
+!Escalamiento
+OferResNRxRD = OferResNRxRD / Base
+PreVenResNRxRD = PreVenResNRxRD * Base
+
+ierror = 0
+ierror_1 = 0
+i = 0
+
+90  format ( a60, i2,a9, i2 ) 
+100  format ( a )
+200  format ( i3, 5x, a12, 4x, a2, 7x, a3, 8x, a9, 4x, a9 )    
+300  format ( 5x, i3, 7x, a12, x, a2, 4x, i4 ) 
+301  format ( 5x, i3, 7x, a12, x, a2, 4x, i4, f9.2 )  
+400  format ( i3, 5x, a5 )    
+500  format ( 10 (i2, 2x) )  
+600  format ( a10, x, i3, x, a1, i3 )     
+700  format ( i3, x, a12, x, 24 (f9.2, 2x) )   
+800  format ( a4, x, i1 )   
+900  format ( 10x, 24 (f9.2, 2x) )   
+1000 format ( i3, x, a12, x, a5, x, 24 (f9.2, 2x) )  
+1100  format ( i3, x, a12, x, a4, x, 24 (f9.2, 2x) )   
+1200  format ( 17x, a4, x, 24 (f9.2, 2x) )   
+1300  format ( i3, 5x, a12, 3x, i2, 6x, i3, 3x, f9.2 )   
+1400  format ( 23x, i2, 6x, i3, 3x, f9.2 )   
+1500  format ( i3, 5x, a12, 6x, 3 (f9.2, 11x), f9.2 )  
+1600  format ( 26x, 3 (f9.2, 11x), f9.2 )  
+1700  format ( a4, x, i2, a1,x, 10 (i2, 2x) )  
+1800  format ( 10 (f9.2, 2x) ) 
+1900  format ( i3, x, a12, x, 24 (i1, 2x) )   
+2000  format ( 17x, 24 (i1, 2x) )   
+2100 format ( i3, x, a12, x, a2, x, f10.2 )    
+2200 format ( i3, x, a12, x, a2, x, i10 )    
+2300 format ( i3, 5x, a12, 6x, 5 ( f9.2, 2x ), f10.4 ) 
+2400 format ( 26x, 5 ( f9.2, 2x ), f10.4 )
+2500 format ( i3, x, a12, x, 24 (i4, 2x) )    
+
+
+end subroutine data_rd

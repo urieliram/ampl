@@ -1,0 +1,26 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## Ejercicio numero 30
+## include ex30.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model e30.mod;
+
+#LOAD .dat
+data e30.dat;
+
+#CHANGE THE SOLVER
+option solver cplex;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z, X;

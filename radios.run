@@ -1,0 +1,35 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+##  include radios.run;
+
+## RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model radios.mod;
+
+#LOAD .dat
+data radios.dat;
+
+#Se muestra el modelo completo extendido
+expand Z,  Rest_Demanda, 
+Rest_Radios_Empleados,
+Rest_Capacitacion_eventuales,
+Rest_balance_trabajadores1,
+Rest_balance_trabajadores;
+
+#CHANGE THE SOLVER
+option solver        cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display Z;
+display x,y,w,s;
+

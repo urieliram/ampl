@@ -1,0 +1,15 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include DCNOPF.run;
+
+model DCNOPF.mod;
+
+data DCNOPF.dat;
+#LOQO:an interior point code for quadratic programming Robert J. Vanderbei
+
+option loqo_options 'convex inftol=1e-6';
+
+option solver LOQO ; #cplexamp KNITRO LOQO BARON LOQO MINOS Gurobi Xpress 
+
+solve;
+display Total_Cost,f,p,loss;
+#expand BalanceNode;

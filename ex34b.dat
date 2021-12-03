@@ -1,0 +1,21 @@
+# Ejercicio 34 inciso b
+
+set PRODUCTO 	:= A B;
+set RECURSOS	:= a b c d;
+
+param B := 
+	  A	4.5 
+	  B	1.5;
+	    
+ 
+param  U:  a	b	c	d	:=  
+       A   1	-1	-1	1
+       B   1	-1	1	0;     
+	   
+	  
+param T := 
+      a	150			
+      b	50
+      c	0
+      d	100;      
+	       

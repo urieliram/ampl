@@ -1,0 +1,69 @@
+## Gasolinera COM REGULAR
+ 
+# Conjuntos
+ set T = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 ;              
+ set P = 1 2;              
+ 
+# Demanda por turno 
+ param d := 
+1	1790.47218
+2	2567.914855
+3	91.29654291
+4	2782.146873
+5	2453.846266
+6	127.5932816
+7	2541.954254
+8	2977.380969
+9	257.093894
+10	2643.816507
+11	2500.894916
+12	160.6316734
+13	295.7761978
+14	1244.388399
+15	122.8307404
+16	2037.014097
+17	2390.173308
+18	83.27924382
+19	0
+20	62.28532487
+21	128.3072882
+;  
+# Inventario deseado al final del turno
+ param s := 
+1	12813.27
+2	13564.75207
+3	13974.21819
+4	14140.01554
+5	14001.68517
+6	14048.73382
+7	14081.77221
+8	11835.59416
+9	10102.60159
+10 9968.338434
+11 9361.536023
+12 9250.814415
+13 9173.461986
+14 14140.01554
+15 14140.01554
+16 14140.01554
+17 14140.01554
+18 8177.898432
+19 8254.646682
+20 10962.84659
+21 13434.59453
+;
+param Cmax:= 28500 ; # Capacidad maxima del tanque
+ 
+param Cmin:= 3000 ; # Capacidad minima del tanque
+ 
+param cp:= 1 15.00  # Costo por litro de la pipa
+		   		       2 14.00;
+                                             
+param cs:= 30.00 ; # Costo por uso de un litro de inventario
+  
+param y0:= 12813.26 ;  #Nivel inicial del tanque al inicio de la planeación
+ 
+param pt:= 3 ; # Numero máximo de pipas por turno.
+
+param p:= 1 10000 # Litros por pipa 
+		          2 20000 ;

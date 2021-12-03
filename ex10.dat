@@ -1,0 +1,32 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## INFORMACIÓN
+##               %Proteínas  %Grasas  %Azúcar  Costo(u.m/kg)
+## Producto  A   30          1        10       0.6
+## Producto  B   5           7        10       0.2
+## Requerido     25g         6g       30g
+
+set PRODUCTOS  := A B;
+set NUTRIENTES := proteina grasa azucar;
+
+param 	contenido: 	proteina grasa azucar :=
+            A		30		1		10
+            B		5		7		10;
+
+param: 	costo :=
+                A	0.6
+                B	0.2;
+
+param requerimiento := proteina 25 
+                       grasa 6 
+                       azucar 30 ;                    
+                        
+## gasto = 76 
+## cantidad [*] :=
+## A   40
+## B  260
+## ;

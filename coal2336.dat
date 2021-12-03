@@ -1,0 +1,147 @@
+#######  #######  #######  #######  #######  #######  #######  #######
+#######  Multiperiod Coal Blending and Distribution Problem    #######
+#######  Programador: Uriel Iram Lezama Lope				   #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				   #######
+#######  (Omision Intencional de Acentos)    				   #######
+#######  #######  #######  #######  #######  #######  #######  #######
+
+####### Instancia Prueba 0
+
+set MINAS    := M1 M2 ;
+set SILOS    := S1 S2 S3  ;
+set CLIENTES := K1 K2 K3  ;
+set T        := 1 2 3 4 5 ;
+
+set A1 :=
+M1 S1   M1 S2   M1 S3  
+M2 S1   M2 S2   M2 S3;
+
+set A2 :=
+S1 K1   S1 K2  S1 K3  
+S2 K1   S2 K2  S2 K3  
+S3 K1   S3 K2  S3 K3  ; 
+
+param Tmax   := 5 ;  # Maximo de tiempo del problema      
+param TaoMax := 3 ;  # Maximo tiempo de entrega al cliente      
+
+#  {i,t} Production (in tons of coal) at mine i during period t.
+param p :  1     2     3     4     5     6     :=
+      M1   11000 11000 11000 11000 11000 11000
+      M2   11000 11000 11000 11000 11000 11000 ;
+
+#  {i,t} ASH PERCENTAGE content in the coal produced at mine / during period t.
+param a :  1   2   3   4   5   6  :=
+      M1   15  15  15  15  15  15
+      M2   13  13  13  13  13  13 ;
+
+#  {i,t} SULFUR PERCENTAGE content in the coal produced at mine i during period t.
+param s :   1  2  3  4  5  6 :=
+      M1    2  2  2  2  2  2
+      M2    2  2  2  2  2  2 ;
+
+#  {i} COST per ton at mine i in a period storage.
+param cM      := 
+      M1  4.0
+      M2  5.0;
+
+#  {i} CAPACITY of the STORAGE facility at mine i is given by Mi
+param M        := 
+      M1 200000
+      M2 200000;         
+
+#  The TRANSPORTATION COST per ton from Mine i to Silo j
+param c1:   S1   S2   S3 :=
+      M1    0.2  0.2  0.2    
+      M2    1.0  1.0  1.0;
+      
+#  STORAGE capacity of silo j
+param S :=
+      S1 200000 
+      S2 200000 
+      S3 200000  ;         	
+
+#  COST STORAGE per-ton  of silo j
+param cS := 
+      S1  4.0
+      S2  5.0
+      S3  5.0 ;
+        	
+#  Initial amount of qj tons of coal stored at silo j
+param q0 :=
+      S1  3000 
+      S2  3000 
+      S3  3000 ;   
+
+#  SULFUR percentage content in t0
+param s0 := 
+      S1  2.0 
+      S2  2.0 
+      S3  2.0  ;   	   
+
+#  ASH percentage content in t0
+param a0 := 
+      S1  15
+      S2  15
+      S3  15  ;   	   
+   	   
+#  CLEANED COST of i to j per ton
+param cB: S1   S2     S3  :=
+      M1  1    1.2    1.2 
+      M2  1    1.2    1.2  ;
+         
+#  ASH content being respectively attenuated by a factor (0,1]
+param beta:   S1     S2     S3  :=
+      M1      0.22   0.22   0.22
+      M2      0.13   0.13   0.13;
+
+#  SULFUR content being respectively attenuated by a factor (0,1] 
+param gamma:  S1     S2     S3  :=
+      M1      0.93   0.93   0.93  
+      M2      1      1      1   ;
+
+#  WEIGHT being thereby attenuated by a factor (0,1]
+param alfa:   S1   S2   S3  :=
+      M1      1    1    1
+      M2      1    1    1   ;
+
+#  The TRANSPORTATION COST per ton from silo j to customer k
+param c2:  K1    K2    K3    :=
+      S1   0.2   0.2   0.2   
+      S2   1.0   1.0   1.0   
+      S3   1.1   1.1   1.1   ; 
+ 
+#  The DEMAND placed (in tons of coal) by customer k during period t
+param d :   1    2     3     4     5     6    :=
+      K1    9000 9000  0     9000  9000  9000
+      K2    6000 9000  0     9000  9000  9000
+      K3    6000 8000  9000  9000  9000  9000 ;    
+	
+#  lower limits ash percentage contents in tons of coal
+param la  :=
+      K1  1  
+      K2  1  
+      K3  1 ;	
+
+#  upper limits ash percentage contents in tons of coal
+param ua :=
+      K1 20
+      K2 20
+      K3 20 ;
+   
+#  lower limits sulfur percentage contents in tons of coal
+param ls  :=
+      K1  0.8  
+      K2  0.8  
+      K3  0.8 ;
+ 	
+#  upper limits sulfur percentage contents in tons of coal
+param us :=
+      K1  5  
+      K2  5  
+      K3  5 ;
+      
+#  per-ton per-percentage point that falls below the maximum specified percentage
+param r  :=
+      K1  0.2
+      K2  0.2
+      K3  0.2 ;

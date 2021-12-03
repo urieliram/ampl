@@ -1,0 +1,31 @@
+## PARA EJECUTAR USAR EL COMANDO
+##  include mMLP.run
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model mMLP.mod; 
+
+#LOAD .dat
+#data mMLP.dat;
+#data data9.dat;
+data br17.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SAVE SOLUTION
+#write bcoalrun;  #usado para soluciones ampl
+#write mcoalrun;  #save to MPS format
+
+#SOLVE
+problem modelo: x, u, mmlp, depo1,depo2,indegree,outdegree,bektas1,bektas2; 
+solve modelo;
+
+#SHOW RESULT
+display  mmlp, x , u ;
+
+#SHOW MODEL
+#expand depo1,depo2,indegree,outdegree,bektas1,bektas2; 
+expand bektas1,bektas2; 

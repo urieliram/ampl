@@ -1,0 +1,36 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+##  INFORMACIÓN
+##  Programa (contenido) Captación de espectadores
+##            20 minutos variedades + 1 minuto publicidad 30000
+##            10 minutos de variedades + 1 minuto de publicidad 10000
+##  PLANTEAMIENTO
+##  Xi Número de exposiciones del programa 1 en el período
+##  X2 Número de exposiciones del programa 2 en el período
+
+set PROGRAMAS := P1 P2 ;
+set RECURSOS := a b; 
+ 
+param A: a   b   :=  
+      P1 20  1 
+      P2 10  1; 
+
+param B := a 80 
+           b 6; 
+
+param C := 
+      P1 30000 
+      P2 10000;
+            
+## ampl: include ex8.run;
+## Solution determined by presolve;
+## objective Z = 100000.
+## Z = 1e+05
+## X [*] :=
+## P1  2
+## P2  4
+## ;

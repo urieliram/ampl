@@ -1,0 +1,37 @@
+# AMPL model for the Sucesive Shortest Path Problem 
+# Problema de AHUJA PAG 318
+
+#(a) initial residual network f
+
+# Problema de AHUJA PAG 318
+set NODES := 1 2 3 4;
+
+set ARCS  := (1,2) 
+             (1,3) 
+             (2,3) 
+             (2,4) 
+             (3,4);
+             #(2,1) #Se incluyen las reversas de los arcos para modelar los residuales
+             #(3,1) 
+             #(3,2) 
+             #(4,2) 
+             #(4,3);
+                          
+param  b :=
+   1   4
+   2   0
+   3   0
+   4  -4 ;
+   
+#	   cost	lower upper bound
+param: 	c 	cpi   u    r:=
+  1 2	2	2     4    4
+  1 3	2	2	  2    2
+  2 3	1	1     2    2
+  2 4	3	3     3    3
+  3 4	1	1     5    5;   
+#  2 1  -2       0
+#  3 1  -2       0
+#  3 2  -1       0
+#  4 2  -3       0
+#  4 3  -1       0;  

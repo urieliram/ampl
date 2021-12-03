@@ -1,0 +1,54 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# X1 Número de artículos tipo A a fabricar
+# X2 Número de artículos tipo B a fabricar
+
+# MAX Z = 1200 X1 + 2000 X2
+
+# 4 X1 + 8 X2 < 600
+# X1          < 120
+# X2          < 70
+# X1 , X2     > 0
+
+set PRODUCTOS := A B ;  
+set RECURSOS  := ACERO ; 
+ 
+ 
+# Sabiendo que el precio de venta de cada artículo de tipo A es de 1200 u.m. y cada uno del tipo B es de 2000 u.m.
+param Beneficio := 
+      A  1200 
+      B  2000 ; 
+ 
+# Para producir un artículo A se consumen 4 kg de acero y, para obtener uno de B, 8
+param Cantidad: ACERO:= 
+                A   4
+                B   8 ;
+      
+# Para fabricar los artículos A y B se dispone de 600 kg de acero.
+param Disponibilidad := 
+                  ACERO 600;  
+
+
+# Limite de fabricacion de los productos A y B
+# no se pueden fabricar más de 120 unidades del tipo A ni más de 70 unidades del tipo B.
+param Limite := 
+              A 120 
+              B 70; 
+              
+              
+              Z = 174000
+              
+# Resultado AMPL
+# X [*] :=
+# A  120
+# B   15
+# ;
+
+# : X.lb    X   X.ub   X.rc    :=
+# A   0    120   120      0
+# B   0     15    70   2000
+# ;

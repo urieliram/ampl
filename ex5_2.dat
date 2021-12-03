@@ -1,0 +1,34 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# Ejercicio numero 5.2
+
+set TURNO := 1 2 3 4 5 6;
+set RECURSOS := a b c d e f; 
+ 
+param A:  a  b  c  d  e  f:=  
+      1   1  0  0  0  0  1
+      2   1  1  0  0  0  0
+      3   0  1  1  0  0  0
+      4   0  0  1  1  0  0
+      5   0  0  0  1  1  0
+      6   0  0  0  0  1  1;
+
+param B := 
+		   a 60 
+           b 50
+           c 35
+           d 55
+           e 40
+           f 25; 
+
+param C := 
+      1 50
+      2 40
+      3 40
+      4 40
+      5 50
+      6 50;

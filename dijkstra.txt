@@ -1,0 +1,45 @@
+# https://s2.smu.edu/~olinick/emis8374/handouts/amplcode.html
+# https://s2.smu.edu/~olinick/emis8374/handouts/dijkstra.html
+# An AMPL implementation of Dijkstra's algorithm as described
+# in "Network Flows: Theory, Algorithms, and Applications" by
+# Ahuja, Magnanti, and Orlin.
+
+# Requires: mcnfp_model.txt.
+
+model mcnfp_model.txt;
+data  dijkstra_data.txt;
+
+set P default {};	       # permanetly-labled nodes
+set T default NODES;       # nodes with temporary lables
+
+set CANDIDATES ordered default {}; # Nodes that can be moved from T to P
+
+param i;			                   # The next node to move from T to P
+
+param d {NODES} default Infinity;	   # distance labels
+param pred {NODES} default 0;		   # predecessor on shortest path
+
+param s default 1;	   # source node
+
+if min{(n1,n2) in ARCS} c[n1,n2] < 0 then {
+  printf "Dijkstra's algorithm does not apply.  This network contains negative-cost arcs.\n";
+} else {
+
+let d[s] := 0;
+repeat while card(P) < card(NODES) {
+  # Move a node with minimum d(i) from T to P
+  let CANDIDATES := {n1 in T: d[n1] == min{n2 in T} d[n2]};
+  let i := first(CANDIDATES);
+  let P := P union {i};
+  let T := T diff {i};
+
+  for {j in T: (i,j) in ARCS}
+   if d[j] > d[i] + c[i,j] then {
+     let d[j] := d[i] + c[i,j];
+     let pred[j] := i;
+   }
+};
+
+display d;
+display pred;
+}

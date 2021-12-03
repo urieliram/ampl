@@ -1,0 +1,30 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+## PARA EJECUTAR USAR EL COMANDO
+## include ex26.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ex26.mod;
+
+#LOAD .dat
+data ex26.dat;
+
+#Se muestra el modelo en forma extendida
+expand Costo, Res_Contratos, Res_Inspecciones;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+option cplex_options 'sensitivity';
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display   X, Res_Contratos, Costo;

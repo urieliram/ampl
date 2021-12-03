@@ -1,0 +1,17 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include ASIGNACIONGEN.run;
+
+#RESET THE AMPL ENVIROMENT
+reset;
+
+#LOAD THE MODEL
+model ASIGNACIONGEN.mod;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW RESULT
+display  Z, x11, x12, x21, x22, x31, x32,dual1,dual2,dual3;

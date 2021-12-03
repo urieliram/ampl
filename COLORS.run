@@ -1,0 +1,8 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include COLORS.run;
+
+model COLORS.mod;
+data COLORS.dat;
+option solver cplexamp;
+solve;
+display x;

@@ -1,0 +1,12 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include dcopf.run;
+
+model dcopf.mod;
+
+#data dcopf.dat;
+
+option solver cplexamp;
+
+#solve;
+
+#display Ship;

@@ -1,0 +1,69 @@
+# Gasolinera CARR, DIESEL
+ 
+# Conjuntos
+ set T = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 ;              
+ set P = 1 2 ;              
+  
+# Demanda por turno 
+ param d := 
+1	4846.545409
+2	2630.196585
+3	875.1509588
+4	6136.866184
+5	2883.768004
+6	1122.330026
+7	5048.363482
+8	2558.130859
+9	948.4745856
+10 7493.147069
+11 2481.568107
+12 1126.292223
+13 7238.113738
+14 2819.174855
+15 928.3254038
+16 3039.14251
+17 1406.353231
+18 877.1765902
+19 932.2750531
+20 1404.696221
+21 727.4595823
+;    
+  # Inventario deseado al final del turno
+ param s := 
+1	23494.85717
+2	23696.67524
+3	23624.60951
+4	23697.93314
+5	25054.21403
+6	24652.01413
+7	24655.97633
+8	26845.72658
+9	27106.77058
+10 27086.6214
+11 22632.61684
+12 21557.40196
+13 21308.28633
+14 27106.77058
+15 27106.77058
+16 27106.77058
+17 27106.77058
+18 20187.86009
+19 20078.39716
+20 24691.46626
+21 25968.47608
+;
+param Cmax:= 67500 ; # Capacidad maxima del tanque
+ 
+param Cmin:= 5000 ; # Capacidad minima del tanque
+ 
+param cp:= 1 15.00  # Costo por litro de la pipa
+                     2 14.30; 
+                     
+param cs:= 30.00 ; # Costo por uso de un litro de inventario
+  
+param y0:= 10990.64 ;  #Nivel inicial del tanque al inicio de la planeación
+ 
+param pt:= 3 ; # Numero máximo de pipas por turno.
+
+param p:= 1 10000 # Litros por pipa 
+                   2 20000  ;

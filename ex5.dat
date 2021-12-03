@@ -1,0 +1,49 @@
+#######  #######  #######  #######  #######  #######  #######    #######
+#######  Programador: Uriel Iram Lezama Lope urieliram@yahoo.com #######
+#######  Posgrado en Ing Sistemas, PISIS, UANL				     #######
+#######  (Omision Intencional de Acentos)    				     #######
+#######  #######  #######  #######  #######  #######  #######    #######
+
+# X1 Número de días a explotar la mina A
+# X2 Número de días a explotar la mina B
+
+# MIN Z = 500 X + 750 X2
+#   X + 2 X2 > 70
+# 2 X + 2 X2 > 130
+# 4 X + 2 X2 > 150
+# X   ,   X2 > 0
+
+set MINAS  := A B ; 
+set PRODUCTOS := ALTA MEDIA BAJA; 
+
+param gastos := A 500 
+                B 750 ;  
+ 
+param produccion[tr]: A   B :=  
+           ALTA   1   2   
+           MEDIA  2   2
+           BAJA   4   2; 
+
+param demanda := 
+      ALTA  70 
+      MEDIA 130
+      BAJA  150; 
+      
+
+# Resultado AMPL
+# X [*] :=
+# A  60
+# B  5
+# ;
+# X1 = 60    La mina A se debe explotar 60 días
+# X2 = 5     La mina B se debe explotar 5 días
+# Z  = 33750 Los costos mínimos son de 33750 u.m.
+
+# minimize Z:
+# 	500*X['A'] + 750*X['B'];
+# subject to tipos_carbon['ALTA']:
+# 	X['A'] + 2*X['B'] >= 70;
+# subject to tipos_carbon['MEDIA']:
+# 	2*X['A'] + 2*X['B'] >= 130;
+# subject to tipos_carbon['BAJA']:
+# 	4*X['A'] + 2*X['B'] >= 150;
