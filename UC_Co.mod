@@ -53,9 +53,9 @@ var u {G,T}         >= 0, binary; ## binary equals 1 if unit g is on in time per
 var v  {G,T}         >= 0, binary; ## binary equals 1 if unit g starts up at the beginning of time period t, and 0 otherwise
 var w {G,T}         >= 0, binary; ## binary equals 1 if unit g shuts down at the beginning of time period t, and 0 otherwise
 
- ###########  OBJECTIVE FUNCTION
+###########  OBJECTIVE FUNCTION
 minimize Z:
-sum{t in T} sum{g in G}( cp[ g , t ] + cU[ g ] * v[ g , t ]+ mpc[g]*u[ g , t ] ) ;  
+sum{t in T} sum{g in G}( cp[ g , t ] + cU[ g ] * v[ g , t ] + mpc[g]*u[ g , t ] ) ;  
 #sum{t in T}sum{g in G}( c[ g ] * p[ g , t ] + cU[ g ] * v[ g , t ] ) ;  
   
 ###########  S.T. 
@@ -123,7 +123,6 @@ sum{ i in 1..min(D[g],card(T)) } u[ g , i ] = 0;
 #sum{ t in T } v[ g , t ] <= NPb[ g ];
 
 ## Piecewise cost
-
 subject to Piecewise_offer42{ g in G, t in T, l in L[g]: l>1} :  
 pl[g,t,l] <= ( Pb[g,l]-Pb[g,l-1] ) * u[g,t];
 

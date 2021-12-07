@@ -1,0 +1,248 @@
+
+reset;
+
+######################################################################
+#  MODEL & DATA
+######################################################################
+#solve BASICOPF--------------1	
+#solve OPF_VAR_SCHEDULE;-----2
+#solve OPF_WIND_FACTS;-------3
+#solve ED_DC;----------------4
+#solve ED_AC;----------------5
+#solve ED_SIMPLE_WIND;-------6
+#solve UC_SIMPLE;------------7
+#solve UC_AC;----------------8
+#solve UC_RE;----------------9
+#solve OPF_PUMP;-------------10
+#solve OPF_BATTERY;----------11
+#solve ED_PUMP;--------------12
+#solve ED_BATTERY;-----------13
+#solve UC_PUMP;--------------14 
+#solve UC_BATTERY;-----------15
+#read inputvalue< -;
+
+param casetype:= 4;
+
+#option solver bonmin;
+#option solver couenne;
+#option solver ipopt;
+option solver cplex;
+#option solver ipopt;
+#option solver knitro;
+#option solve  baron;
+#option solver minos;
+
+model Cone_opf.mod;
+#data  case390.dat; 
+#data  case570.dat; 
+
+
+data case39.dat;
+#data case9mod1.dat;
+#data case118.dat;
+#data  case300.dat;
+#data case300_relax.dat;
+#data  case2383wp.dat;
+#data  case1354pegase_ori.dat
+#data  case1354pegase_reorder.dat
+#data   case3120sp_reorder.dat;
+#data  case2383wp.dat;
+#data  case3120sp.dat
+#data  case3012wp.dat
+#data  psse_sys23m.dat;  
+#data  case1354.dat; 
+#data  case39.dat
+#data caseforAMPL.dat
+#data  case39_case2.dat
+#data  case2746wp_opfreorder.dat
+#data   case2746wp_reorder.dat;
+#data   case2869pegase.dat;
+#data   INC_chg_ctrls.dat;  
+######################################################################
+#  SOLVER OPTIONS
+######################################################################
+option show_stats 1;
+# minos
+
+#option solver cplex;
+
+#option bonmin_options
+	#"bonmin.algorithm B-QG  bonmin.solution_limit 2";
+  #  "bonmin.algorithm B-iFP bonmin.time_limit 400";
+ # ;
+	
+######################################################################
+#  DATA SCALING & INITIALIZATION
+######################################################################
+
+# bus voltage 
+for{i in BUS}
+{
+   let bus_vm[i] := bus_vm0[i];
+   let bus_va[i] := bus_va0[i] * 3.14159/180;
+   
+   let bus_pd[i] := bus_pd[i]/basemva;
+   let bus_qd[i] := bus_qd[i]/basemva;
+   let bus_shunt_g[i] := bus_shunt_g[i]/basemva;
+   let bus_shunt_b[i] := bus_shunt_b[i]/basemva;
+   
+   let cii[i] := bus_vm0[i]*bus_vm0[i];
+}
+
+# branch paramters
+for{(l,k,m) in BRANCH}
+{
+	let branch_rate1[l,k,m] := branch_rate1[l,k,m]/basemva;
+	let branch_rate2[l,k,m] := branch_rate2[l,k,m]/basemva;
+	let branch_rate3[l,k,m] := branch_rate3[l,k,m]/basemva;
+	
+	let cij[l,k,m] := 1;
+	let sij[l,k,m] := 0.5;
+}
+
+# transformer parameters
+for{(l,k,m) in TRANS}
+{
+   let trans_shi[l,k,m] := trans_shift0[l,k,m] * 3.14159/180; 
+   let trans_shift_min[l,k,m] := trans_shift_min[l,k,m] * 3.14159/180; 
+   let trans_shift_max[l,k,m] := trans_shift_max[l,k,m] * 3.14159/180; 
+#   let trans_shi_size[l,k,m] := trans_shi_size[l,k,m] * 3.14159/180; 
+   let trans_tap[l,k,m] := trans_tap0[l,k,m];
+   let trans_rate1[l,k,m] := trans_rate1[l,k,m]/basemva;
+   let trans_rate2[l,k,m] := trans_rate2[l,k,m]/basemva;
+   let trans_rate3[l,k,m] := trans_rate3[l,k,m]/basemva;
+}
+
+# thermal generation
+for{(g,i) in TGEN}
+{
+   let tgen_p0[g,i] := tgen_p0[g,i]/basemva;
+   let tgen_q0[g,i] := tgen_q0[g,i]/basemva;
+   let tgen_p[g,i] := tgen_p0[g,i];
+   let tgen_q[g,i] := tgen_q0[g,i];
+   let tgen_p_min[g,i] := tgen_p_min[g,i]/basemva;
+   let tgen_p_max[g,i] := tgen_p_max[g,i]/basemva;
+   let tgen_q_min[g,i] := tgen_q_min[g,i]/basemva;
+   let tgen_q_max[g,i] := tgen_q_max[g,i]/basemva;
+}
+
+# shunt capacitors
+for{(sw,i) in SWSHUNT}
+{
+   let shunt_b[sw,i] := shunt_b0[sw,i]/basemva;
+}
+
+#---------------------------------------------------------------------
+#  
+#                  PROBLEM SOLVING
+#
+#---------------------------------------------------------------------
+
+# OPF problem for basic testing
+problem ACOPF;
+fix {i in BUS: bus_type[i] == 3} bus_va[i];
+#fix {i in BUS} bus_vm[i];
+#fix {i in BUS} bus_va[i];
+fix {(l,k,m) in TRANS} trans_tap[l,k,m];
+fix {(l,k,m) in TRANS} trans_shi[l,k,m];
+#fix {(i,j) in TGEN} tgen_p[i,j];
+#fix {(i,j) in TGEN: bus_type[j] <> 3 && STATUS_CHG_GP[i,j] <> 1} tgen_p[i,j];
+#fix {(i,j) in TGEN: bus_type[j] <> 3} tgen_p[i,j];
+#fix {(i,j) in TGEN: bus_type[j] <> 3} bus_vm[j];
+#fix {(i,j) in TGEN} bus_vm[j];
+#fix {(sw,i) in SWSHUNT} shunt_b[sw,i];
+
+
+problem ConeOPF;
+fix {i in BUS: bus_type[i] == 3} cii[i];
+
+
+
+solve ConeOPF; 
+
+ 
+printf  {(i,g) in TGEN}:"%6i  %5i  %16.5f   %16.5f \n",i, g, tgen_p[i,g], tgen_q[i,g] > temp.txt; 
+printf  {k in BUS}:"%6i  %16.5f\n", k, cii[k] > temp.txt;
+printf  {(l,k,m) in BRANCH}:"%6i  %6i  %6i  %16.5f  %16.5f\n",l,k,m,cij[l,k,m],sij[l,k,m]>temp.txt;
+
+ 
+ 
+ 
+/*
+printf  {(b,k,m) in BRANCHTRANS: k==12}:"%6i  %5i %5i  G:%16.5f   B:%16.5f cij:%16.5f sij:%16.5f\n",b, k, m, G[k,m],  B[k,m], cij[b,k,m] , sij[b,k,m] > temp.txt; 
+printf  {(b,k,m) in BRANCHTRANS: m==12}:"%6i  %5i %5i  G:%16.5f   B:%16.5f cij:%16.5f sij:%16.5f\n",b, k, m, G[k,m],  B[k,m], cij[b,k,m] , sij[b,k,m] > temp.txt; 
+
+printf  {k in BUS: k==12}:"%6i IJPinj:%16.5f pinjion:%16.5f   \n",k, IJPinj[k], pinjtion[k] > temp.txt; 
+
+printf  {k in BUS: k==12}:"%6i IJPinj5f:%16.5f  IJPinj5t:%16.5f \n",k, IJPinj5f[k],IJPinj5t[k]  > temp.txt; 
+*/ 
+/*
+#---------------------------------------------------------------------
+#  
+#                  variable for output
+#
+#---------------------------------------------------------------------	
+var branch_svalue_f {(l,k,m) in BRANCH: branch_rate1[l,k,m] <= 400}=
+           sqrt(branch_p_f[l,k,m]^2+branch_q_f[l,k,m]^2);
+
+var branch_svalue_t {(l,k,m) in BRANCH: branch_rate1[l,k,m] <= 400}=
+           sqrt(branch_p_t[l,k,m]^2+branch_q_t[l,k,m]^2);
+		   
+var trans_svalue {(l,k,m) in TRANS:trans_rate1[l,k,m] <= 400}=
+           sqrt(trans_p[l,k,m]^2+trans_q[l,k,m]^2);	
+	
+var mismatch_p_balance {k in BUS}=
+  sum{(g,k) in TGEN} tgen_p[g,k] 
+  - bus_pd[k]
+  - sum{(k,m) in YBUS} (bus_vm[k] * bus_vm[m]
+                        * (  G[k,m] * cos(bus_va[k] - bus_va[m])
+                           + B[k,m] * sin(bus_va[k] - bus_va[m])));
+  
+var mismatch_q_balance {k in BUS: k == 8}=
+  sum{(g,k) in TGEN} tgen_q[g,k] 
+  - bus_qd[k]
+  - sum{(k,m) in YBUS} (bus_vm[k] * bus_vm[m]
+                        * (  G[k,m] * sin(bus_va[k] - bus_va[m])
+                           - B[k,m] * cos(bus_va[k] - bus_va[m])));	
+var mismatch_q_balance8 {(k,m) in YBUS: k ==8}=
+ # sum{(g,k) in TGEN} tgen_q[g,k] 
+ # - bus_qd[k]
+  - (bus_vm[k] * bus_vm[m]
+                        * (  G[k,m] * sin(bus_va[k] - bus_va[m])
+                           - B[k,m] * cos(bus_va[k] - bus_va[m])));	
+                           */
+######################################################################
+#  OPF results OUTPUT
+######################################################################
+/*
+if  casetype == 1 then	#BASICOPF
+	{
+		printf "\ncalculation is complete, writing report to 'BASICOPF_results.txt'\n\n";
+		printf  "The total cost is: %6.3f\n", Total_fuel_cost > BASICOPF_results.txt;
+		
+		#active power and reactive power
+		printf "\nConventional Unit Power output:\n index    Bus       active-Power     reactive-Power\n">BASICOPF_results.txt;
+		printf {(i,j) in TGEN }:"%6i  %5i   %16.3f   %16.3f\n",i, j, tgen_p[i,j], tgen_q[i,j] >BASICOPF_results.txt;
+		
+		printf "\ntransformer tap:\n   index   F_bus   T_bus         tap\n">BASICOPF_results.txt; #transfomaer
+		printf {(l,k,m) in TRANS }:"%8i%8i%8i%12.3f\n",l,k, m, trans_tap[l,k,m] >BASICOPF_results.txt;
+
+		#printf "\ntransformer tap:\n   tap\n">BASICOPF_results.txt;
+		#printf {(i,j) in WIND }:"%12.3f\n ", i, j, w_schedule[i,j] >BASICOPF_results.txt;
+		
+		printf "\nshifter value:\n   index   F_bus   T_bus         tap\n">BASICOPF_results.txt;
+		printf {(l,k,m) in TRANS }:"%8i%8i%8i%12.3f\n",l,k, m, trans_shi[l,k,m] >BASICOPF_results.txt;
+			
+		printf "\nshunt value:\n   index     bus       shunt\n">BASICOPF_results.txt;
+		printf {(i,j) in SWSHUNT }:"%8i%8i%12.3f\n", i, j, shunt_b[i,j] >BASICOPF_results.txt;
+		
+		printf "\nbus voltage and angle:\n     bus     voltage      angle\n">BASICOPF_results.txt;		
+		printf {i in BUS }:"%8i%12.3f%12.3f\n", i,bus_vm[i],bus_va[i] >BASICOPF_results.txt;
+
+		#apparent power of branch
+		printf  "Sbranch = [ \n" >BASICOPF_results.txt;
+		printf {(b,k,m) in BRANCH: branch_rate1[b,k,m] <= 4000}:"%6i  %5i %5i  %16.5f   %16.5f\n",b, k, m, branch_svalue_f[b,k,m], branch_svalue_t[b,k,m] >BASICOPF_results.txt;
+		printf  "]; \n" >BASICOPF_results.txt;
+		
+	}
+*/
