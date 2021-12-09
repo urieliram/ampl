@@ -23,9 +23,10 @@ option solver cplexamp;
 solve;
 
 #SHOW RESULT
-display   p ,  pb , u , v, w ,cp, pl ;
-expand Morales_uptime3a,
-Morales_uptime3b;
+display   p ,  pb , u , v, w ,cp, pl, delta ;
+expand Start_up_cost54, Start_up_cost57,Start_up_cost58;
+#Morales_uptime3a,
+#Morales_uptime3b;
  #Piecewise_offer42,
  #Piecewise_offer43, 
  #Piecewise_offer44;
