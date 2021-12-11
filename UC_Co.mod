@@ -59,7 +59,7 @@ var delta {g in G, T, s in S[g]} >= 0, binary; ## binary equals 1 if unit g star
 
 ###########  OBJECTIVE FUNCTION
 minimize Z:
-sum{t in T} sum{g in G}( cp[ g , t ] + cSU[ g , t ] * v[ g , t ] + mpc[g]*u[ g , t ] ) ;  
+sum{t in T} sum{g in G}( cp[ g , t ] + cSU[ g , t ]*v[ g , t ] + mpc[ g ]*u[ g , t ] ) ;  
 #sum{t in T}sum{g in G}( c[ g ] * p[ g , t ] + cU[ g ] * v[ g , t ] ) ;  
   
 ###########  S.T. 
@@ -136,7 +136,7 @@ sum{ l in L[g]} pl[g,t,l] = pc[g,t]; #pc[g,t]
 subject to Piecewise_offer44{ g in G, t in T } : 
 sum{ l in L[g]} C[g,l] * pl[g,t,l] = cp[g,t]; 
 
-#Start-up cost Morales-españa2013b eq.(54)
+#Start-up cost Morales-españa2013b
 subject to Start_up_cost54{ g in G, t in T, s in S[g]: s<card(S[g]) and t>=Tmin[g,s+1]} :  
 delta[g,t,s] <= sum{ i in Tmin[g,s]..(Tmin[g,s+1]-1) }  w[g,t-i];
 
@@ -145,7 +145,6 @@ v[g,t] >= sum{ s in 1..(card(S[g])-1) }  delta[g,t,s];
 
 subject to Start_up_cost58{ g in G, t in T} :  
 cSU[g,t] = Cs[g,card(S[g])] * v[g,t] - sum{ s in 1..(card(S[g])-1) } ( Cs[g,card(S[g])] - Cs[g,s] ) * delta[g,t,s];
-
 
 
 
