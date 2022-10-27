@@ -1,0 +1,20 @@
+## PARA EJECUTAR USAR EL COMANDO
+## include PTDF.run;
+
+#LOAD THE MODEL
+model PTDF.mod;
+
+#LOAD THE MODEL
+data PTDF.dat;
+
+#CHANGE THE SOLVER
+option solver cplexamp;
+
+#SOLVE
+solve;
+
+#SHOW CONTRAINTS
+expand cons2;
+
+#SHOW
+display z,iny;
